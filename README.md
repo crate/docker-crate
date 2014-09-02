@@ -12,9 +12,9 @@ published to the public [Docker Hub Registry][4].
 
 1. Install [Docker][1]
 
-2. Download automated build from public [Docker Hub Registry][2]
+2. Download latest automated build from public [Docker Hub Registry][2]
 
-        docker pull crate/crate
+        docker pull crate/crate:latest
 
    alternatively you can build an image from `Dockerfile`:
 
@@ -22,7 +22,7 @@ published to the public [Docker Hub Registry][4].
 
 ## Usage
 
-    docker run -d -p 4200:4200 -p 4300:4300 crate/crate
+    docker run -d -p 4200:4200 -p 4300:4300 crate/crate:latest
 
 ## Attach persistent data directory
 
@@ -38,6 +38,15 @@ For example, configuring the cluster name by using system properties will work t
     docker run -d -p 4200:4200 -p 4300:4300 crate/crate /crate/bin/crate -Des.cluster.name=cluster
 
 For further configuration options please refer to the [Configuration][6] section of the online documentation.
+
+## Environment
+
+To set environment variables for Crate Data you need to use the ``--env`` option when starting
+the docker image.
+
+For example, setting the heap size:
+
+    docker run -d -p 4200:4200 -p 4300:4300 --env CRATE_HEAP_SIZE=32g crate/crate
 
 ## Multicast
 
