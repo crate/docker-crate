@@ -28,4 +28,5 @@ git add Dockerfile
 git commit -m "updated Dockerfile to use crate version $VERSION"
 
 git tag $VERSION
+git push
 git push --tags
