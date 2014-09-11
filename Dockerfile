@@ -8,10 +8,10 @@ FROM dockerfile/java:openjdk-7-jre
 
 RUN \
   cd /tmp && \
-  wget https://cdn.crate.io/downloads/releases/crate-0.42.2.tar.gz && \
-  tar xvzf crate-0.42.2.tar.gz && \
-  rm -f crate-0.42.2.tar.gz && \
-  mv /tmp/crate-0.42.2 /crate
+  wget https://cdn.crate.io/downloads/releases/crate-0.42.3.tar.gz && \
+  tar xvzf crate-0.42.3.tar.gz && \
+  rm -f crate-0.42.3.tar.gz && \
+  mv /tmp/crate-0.42.3 /crate
 
 
 VOLUME ["/data"]
