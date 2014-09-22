@@ -4,7 +4,7 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM dockerfile/java:openjdk-7-jre
+FROM java:7
 
 RUN \
   cd /tmp && \
