@@ -8,10 +8,10 @@ FROM java:7
 
 RUN \
   cd /tmp && \
-  wget https://cdn.crate.io/downloads/releases/crate-0.44.2.tar.gz && \
-  tar xvzf crate-0.44.2.tar.gz && \
-  rm -f crate-0.44.2.tar.gz && \
-  mv /tmp/crate-0.44.2 /crate
+  wget https://cdn.crate.io/downloads/releases/crate-0.44.4.tar.gz && \
+  tar xvzf crate-0.44.4.tar.gz && \
+  rm -f crate-0.44.4.tar.gz && \
+  mv /tmp/crate-0.44.4 /crate
 
 
 VOLUME ["/data"]
