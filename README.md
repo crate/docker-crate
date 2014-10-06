@@ -1,12 +1,3 @@
-# Supported Tags
-
-- `latest`
-- [`0.41.4`](https://github.com/crate/docker-crate/releases/tag/0.41.4)
-- [`0.42.1`](https://github.com/crate/docker-crate/releases/tag/0.42.1)
-- [`0.42.2`](https://github.com/crate/docker-crate/releases/tag/0.42.2)
-- [`0.42.3`](https://github.com/crate/docker-crate/releases/tag/0.42.3)
-- [`0.43.1`](https://github.com/crate/docker-crate/releases/tag/0.43.1)
-
 # What is Crate?
 
 Crate is an Elastic SQL Data Store. Distributed by design, Crate makes
