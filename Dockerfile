@@ -6,13 +6,12 @@
 
 FROM java:7
 
-RUN \
-  cd /tmp && \
-  wget https://cdn.crate.io/downloads/releases/crate-0.44.4.tar.gz && \
-  tar xvzf crate-0.44.4.tar.gz && \
-  rm -f crate-0.44.4.tar.gz && \
-  mv /tmp/crate-0.44.4 /crate
+ENV CRATE_VERSION 0.44.4
+RUN mkdir /crate && \
+  wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
+  | tar -xzC /crate --strip-components=1
 
+ENV PATH /crate/bin:$PATH
 
 VOLUME ["/data"]
 
@@ -20,7 +19,7 @@ ADD config/crate.yml /crate/config/crate.yml
 
 WORKDIR /data
 
-CMD ["/crate/bin/crate"]
+CMD ["crate"]
 
 EXPOSE 4200
 EXPOSE 4300
