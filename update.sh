@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 
 if [[ -z "$1" ]]; then
@@ -8,7 +8,7 @@ else
     VERSION=$1
 fi
 
-VERSION_EXISTS=$(curl -f -XHEAD --head https://cdn.crate.io/downloads/releases/crate-${VERSION}.tar.gz)
+VERSION_EXISTS=$(curl -fsSI https://cdn.crate.io/downloads/releases/crate-${VERSION}.tar.gz)
 
 if [ "$?" != "0" ]; then
     echo "version $VERSION doesn't exist!"
@@ -24,9 +24,5 @@ then
 fi
 
 sed "s/XXX/$VERSION/g" Dockerfile.template > Dockerfile
-git add Dockerfile
-git commit -m "updated Dockerfile to use crate version $VERSION"
 
-git tag $VERSION
-git push
-git push --tags
+
