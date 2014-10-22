@@ -1,10 +1,14 @@
 # What is Crate?
 
-Crate is an Elastic SQL Data Store. Distributed by design, Crate makes
-centralized database servers obsolete. Realtime non-blocking SQL engine with
-full blown search. Highly available, massively scalable yet simple to use.
+Crate is a new breed of database to serve today’s mammoth data needs.
+Based on the familiar SQL syntax, Crate combines high availability, resiliency, and scalability
+in a distributed design that allows you to query mountains of data in realtime, not batches.
 
-    [Crate][3]
+We solve your data scaling problems and make administration a breeze.
+**Easy to scale, simple to use.**
+
+
+[Crate][3]
 
 # Crate Data Dockerfile
 
@@ -38,12 +42,12 @@ published to the public [Docker Hub Registry][4].
 
 ### Use custom Crate configuration
 
-    docker run -d -p 4200:4200 -p 4300:4300 crate/crate -Des.config=/path/to/crate.yml
+    docker run -d -p 4200:4200 -p 4300:4300 crate/crate crate -Des.config=/path/to/crate.yml
 
 Any configuration settings may be specified upon startup using the `-D` option prefix.
 For example, configuring the cluster name by using system properties will work this way::
 
-    docker run -d -p 4200:4200 -p 4300:4300 crate/crate /crate/bin/crate -Des.cluster.name=cluster
+    docker run -d -p 4200:4200 -p 4300:4300 crate/crate crate -Des.cluster.name=cluster
 
 For further configuration options please refer to the [Configuration][6] section of the online documentation.
 
