@@ -6,7 +6,7 @@
 
 FROM java:7
 
-ENV CRATE_VERSION 0.44.6
+ENV CRATE_VERSION 0.45.2
 RUN mkdir /crate && \
   wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
   | tar -xzC /crate --strip-components=1
