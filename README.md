@@ -7,8 +7,8 @@ in a distributed design that allows you to query mountains of data in realtime, 
 We solve your data scaling problems and make administration a breeze.
 **Easy to scale, simple to use.**
 
-
 [Crate][3]
+
 
 # Crate Data Dockerfile
 
@@ -79,6 +79,24 @@ the publish port to Crate.
 
     docker run -d -p 4200:4200 -p 4321:4300 crate/crate crate -Des.transport.publish_port=4321
 
+### Example Usage in a Multinode Setup
+
+    HOSTS='crate1.example.com:4300,crate2.example.com:4300,crate3.example.com:4300'
+    HOST=crate1.example.com
+    docker run -d \
+        -p 4200:4200 \
+        -p 4300:4300 \
+        --name node1 \
+        --volume /mnt/data:/data \
+        --env CRATE_HEAP_SIZE=8g \
+        crate/crate:latest \
+        crate -Des.cluster.name=cratecluster \
+              -Des.node.name=crate1 \
+              -Des.transport.publish_port=4300 \
+              -Des.network.publish_host=$HOST \
+              -Des.multicast.enabled=false \
+              -Des.discovery.zen.ping.unicast.hosts=$HOSTS \
+              -Des.discovery.zen.minimum_master_nodes=2
 
 # License
 
@@ -110,7 +128,7 @@ we need you to agree to our [CLA][11]. For further information please refer to [
 [4]: https://registry.hub.docker.com/
 [5]: https://registry.hub.docker.com/_/java/
 [6]: https://crate.io/docs/stable/configuration.html
-[7]: https://crate.io/blog/using-crate-in-multinode-setup/
+[7]: https://crate.io/docs/en/latest/best_practice/multi_node_setup.html
 [8]: https://github.com/crate/crate/blob/master/LICENSE.txt
 [9]: https://github.com/crate/docker-crate/issues
 [10]: http://freenode.net
