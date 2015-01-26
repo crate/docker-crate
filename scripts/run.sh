@@ -36,4 +36,5 @@ else
     echo "HEAP: $CRATE_HEAP_SIZE"
 fi
 
+export CRATE_JAVA_OPTS
 /crate/bin/crate
