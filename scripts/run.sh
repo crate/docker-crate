@@ -30,10 +30,10 @@ else
 fi
 
 # HEAP memory
-if [ -z "$CRATE_HEAP_MEM" ]; then
-    echo "CRATE_HEAP_MEM not set, using defaults"
+if [ -z "$CRATE_HEAP_SIZE" ]; then
+    echo "CRATE_HEAP_SIZE not set, using defaults"
 else
-    echo "HEAP: $CRATE_HEAP_MEM"
+    echo "HEAP: $CRATE_HEAP_SIZE"
 fi
 
 /crate/bin/crate
