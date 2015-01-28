@@ -16,6 +16,8 @@ VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD scripts/run.sh /crate/bin/run.sh
+ADD scripts/mesos.in.sh /crate/bin/mesos.in.sh
+ADD scripts/weave.in.sh /crate/bin/weave.in.sh
 
 WORKDIR /data
 

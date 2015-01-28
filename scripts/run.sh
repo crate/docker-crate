@@ -1,32 +1,25 @@
 #!/usr/bin/env bash
 
+DIR="$(dirname "$0")"
+
+# detect docker environment we're running in
+
+# mesos
+if [ "x$MESOS_SANDBOX" != "x" ]; then
+    echo "MESOS detected"
+    . "$DIR/mesos.in.sh"
+# weave
+elif [ -d "/sys/class/net/ethwe" ]; then
+    echo "WEAVE detected"
+    . "$DIR/weave.in.sh"
+fi
+
 # other peers for discovery
-if [ -z "$HOSTS" ]; then
-    echo "HOSTS not specified, using multicast discovery (DEFAULT)"
+if [ -z "$CRATE_HOSTS" ]; then
+    echo "CRATE_HOSTS not specified, using multicast discovery (DEFAULT)"
 else
-    CRATE_JAVA_OPTS="$CRATE_JAVA_OPTS -Des.multicast.enabled=false -Des.discovery.zen.ping.unicast.hosts=$HOSTS"
-    echo "HOSTS: using unicast discovery with '$HOSTS'"
-fi
-# hostname of the container host
-if [ -z "$HOST" ]; then
-    echo "HOST: not specified, using '$HOSTNAME' (DEFAULT)"
-else
-    CRATE_JAVA_OPTS="$CRATE_JAVA_OPTS -Des.network.publish_host=$HOST"
-    echo "HOST: '$HOST' (publish_host)"
-fi
-# ports for http and transport
-if [ -z "$PORT_4200" ]; then
-    echo "PORT_4200 not specified, using 4200 (DEFAULT)"
-else
-    CRATE_JAVA_OPTS="$CRATE_JAVA_OPTS -Des.http.publish_port=$PORT_4200"
-    echo "PORT: $PORT_4200<->4200 (http)"
-fi
-# outside exposed port for the transport protocol
-if [ -z "$PORT_4300" ]; then
-    echo "PORT_4300 not specified, using 4300 (DEFAULT)"
-else
-    CRATE_JAVA_OPTS="$CRATE_JAVA_OPTS -Des.transport.publish_port=$PORT_4300"
-    echo "PORT: $PORT_4300<->4300 (transport)"
+    CRATE_JAVA_OPTS="$CRATE_JAVA_OPTS -Des.multicast.enabled=false -Des.discovery.zen.ping.unicast.hosts=$CRATE_HOSTS"
+    echo "CRATE_HOSTS: using unicast discovery with '$CRATE_HOSTS'"
 fi
 
 # HEAP memory
@@ -36,5 +29,9 @@ else
     echo "HEAP: $CRATE_HEAP_SIZE"
 fi
 
-export CRATE_JAVA_OPTS
+if [ "x$CRATE_JAVA_OPTS" != "x" ]; then
+    echo "CRATE_JAVA_OPTS: '$CRATE_JAVA_OPTS'"
+    export CRATE_JAVA_OPTS
+fi
+
 /crate/bin/crate
