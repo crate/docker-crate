@@ -1,6 +1,6 @@
 ## -*- docker-image-name: "docker-crate" -*-
 #
-# Crate Data Dockerfile
+# Crate Dockerfile
 # https://github.com/crate/docker-crate
 #
 
@@ -12,14 +12,18 @@ RUN mkdir /crate && \
   | tar -xzC /crate --strip-components=1
 
 ENV PATH /crate/bin:$PATH
-
 VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
+ADD scripts/run.sh /crate/bin/run.sh
+ADD scripts/mesos.in.sh /crate/bin/mesos.in.sh
+ADD scripts/weave.in.sh /crate/bin/weave.in.sh
 
 WORKDIR /data
 
-CMD ["crate"]
-
+# http
 EXPOSE 4200
+# transport
 EXPOSE 4300
+
+CMD ["run.sh"]
