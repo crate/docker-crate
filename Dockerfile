@@ -11,13 +11,15 @@ RUN mkdir /crate && \
   wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
   | tar -xzC /crate --strip-components=1
 
-ENV PATH /crate/bin:$PATH
+RUN mkdir -p /usr/bin
+ENV PATH /usr/bin:$PATH
+
 VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
-ADD scripts/run.sh /crate/bin/run.sh
-ADD scripts/mesos.in.sh /crate/bin/mesos.in.sh
-ADD scripts/weave.in.sh /crate/bin/weave.in.sh
+ADD scripts/run.sh /usr/bin/crate
+ADD scripts/mesos.in.sh /usr/bin/mesos.in.sh
+ADD scripts/weave.in.sh /usr/bin/weave.in.sh
 
 WORKDIR /data
 
@@ -26,4 +28,4 @@ EXPOSE 4200
 # transport
 EXPOSE 4300
 
-CMD ["run.sh"]
+CMD ["crate"]
