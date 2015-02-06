@@ -5,6 +5,7 @@
 #
 
 FROM java:7
+MAINTAINER Crate Technology GmbH <office@crate.io>
 
 ENV CRATE_VERSION 0.45.8
 RUN mkdir /crate && \
