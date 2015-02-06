@@ -1,24 +1,25 @@
 # What is Crate?
 
-Crate is a new breed of database to serve today’s mammoth data needs.
+Crate is _the_ distributed database for containerized environments, such as Docker.
 Based on the familiar SQL syntax, Crate combines high availability, resiliency, and scalability
 in a distributed design that allows you to query mountains of data in realtime, not batches.
 
 We solve your data scaling problems and make administration a breeze.
-**Easy to scale, simple to use.**
 
-[Crate][3]
+**Scale data as elastic as your application!**
+
+[Crate.IO Website][3]
 
 
-# Crate Data Dockerfile
+# Crate Dockerfile
 
-This repository contains **Dockerfile** of [Crate Data][3] for [Docker][1]'s [automated build][2]
+This repository contains **Dockerfile** of [Crate][3] for [Docker][1]'s [automated build][2]
 published to the public [Docker Hub Registry][4].
 
 
 ## Base Docker Image
 
-- [java:][5]
+- [java:7][5]
 
 ## Installation
 
@@ -53,7 +54,7 @@ For further configuration options please refer to the [Configuration][6] section
 
 ### Environment
 
-To set environment variables for Crate Data you need to use the ``--env`` option when starting
+To set environment variables for Crate you need to use the ``--env`` option when starting
 the docker image.
 
 For example, setting the heap size:
@@ -66,7 +67,7 @@ Crate uses multicast for node discovery by default. However, Docker does only su
 host. This means that nodes that are started on the same host will discover each other automatically,
 but nodes that are started on different hosts need unicast enabled.
 
-You can enable unicast in your custom ``crate.yml``. See also: [Using Crate Data in a Multi Node Setup][7].
+You can enable unicast in your custom ``crate.yml``. See also: [Using Crate in a Multi Node Setup][7].
 
 Due to its architecture, Crate publishes the host it runs on for discovery within the cluster. Since
 the address of the host inside the docker container differs from the actual host the docker image is
@@ -117,7 +118,7 @@ For further information and official contact please visit [https://crate.io][3].
 
 ## Contributing
 
-You are very welcome to contribute features or fixes! Before we can accept any pull requests to Crate Data
+You are very welcome to contribute features or fixes! Before we can accept any pull requests to Crate
 we need you to agree to our [CLA][11]. For further information please refer to [CONTRIBUTING.rst][12].
 
 
