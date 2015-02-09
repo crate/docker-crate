@@ -5,7 +5,8 @@ if [[ -z "$1" ]]; then
     echo "update.sh <version>"
     exit 1
 else
-    VERSION=$1
+    TAG=$1
+    VERSION=`echo $TAG | cut -d '-' -f 1`
 fi
 
 VERSION_EXISTS=$(curl -fsSI https://cdn.crate.io/downloads/releases/crate-${VERSION}.tar.gz)
@@ -15,9 +16,9 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-TAG_EXISTS=$(git tag | grep $VERSION)
+TAG_EXISTS=$(git tag | grep $TAG)
 
-if [ "$VERSION" == "$TAG_EXISTS" ]
+if [ "$TAG" == "$TAG_EXISTS" ]
 then
     echo "Tag $TAG_EXISTS already in use"
     exit 1
