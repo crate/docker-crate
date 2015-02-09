@@ -32,3 +32,4 @@ EXPOSE 4200
 EXPOSE 4300
 
 CMD ["crate"]
+
