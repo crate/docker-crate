@@ -1,1 +1,1 @@
-Crate is a shared nothing, fully searchable, document oriented cluster datastore
+Crate is a distributed database especially designed for containerized environments such as Docker.
