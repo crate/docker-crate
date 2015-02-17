@@ -7,7 +7,7 @@
 FROM java:7
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
-ENV CRATE_VERSION 0.46.5
+ENV CRATE_VERSION 0.47.3
 RUN mkdir /crate && \
   wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
   | tar -xzC /crate --strip-components=1
