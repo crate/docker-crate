@@ -28,7 +28,7 @@ class DockerBaseTestCase(TestCase):
         if self.cli.info()['Name'] == u'boot2docker':
             import subprocess;
             crate_ip = subprocess.check_output(r'boot2docker ip',
-                stderr=subprocess.STDOUT, shell=True).strip('\n')
+                stderr=None, shell=True).strip('\n')
         return connect(['{0}:{1}'.format(crate_ip, str(port))])
 
     def setUp(self):
@@ -101,7 +101,7 @@ def docker(cmd, ports={}, env=[]):
         def inner_fn(self, *args, **kwargs):
             print(self.__class__.__doc__)
             self._start(cmd=cmd, ports=ports, env=env)
-            fn(self) 
+            fn(self)
         return inner_fn
     return wrap
 
@@ -140,7 +140,7 @@ class JavaPropertiesTest(DockerBaseTestCase):
 
 class EnvironmentVariablesTest(DockerBaseTestCase):
     """
-    docker run -p 4200:4200 --env CRATE_HEAP_SIZE=1g --env CRATE_HOSTS=127.0.0.1:4300 crate crate 
+    docker run -p 4200:4200 --env CRATE_HEAP_SIZE=1g --env CRATE_HOSTS=127.0.0.1:4300 crate crate
     """
 
     @docker(['crate'], ports={4200:4200}, env=['CRATE_HEAP_SIZE=1g', 'CRATE_HOSTS=127.0.0.1:4300'])

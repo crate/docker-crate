@@ -42,7 +42,7 @@ class DockerLayer(object):
             kwargs = kwargs_from_env()
             kwargs['tls'].assert_hostname = False
             self.client = Client(**kwargs)
-   
+
     def setUp(self):
         if self.client.ping() == u'OK':
             self.start()
