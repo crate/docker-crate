@@ -16,17 +16,6 @@ print_blue() {
 
 DIR="$(dirname "$0")"
 
-# detect docker environment we're running in
-
-# mesos
-if [ "x$MESOS_SANDBOX" != "x" ]; then
-    MESSAGE="MESOS detected"; print_blue
-    . "$DIR/mesos.in.sh"
-# weave
-elif [ -d "/sys/class/net/ethwe" ]; then
-    MESSAGE="WEAVE detected"; print_blue
-    . "$DIR/weave.in.sh"
-fi
 
 # other peers for discovery
 MESSAGE="CRATE_HOSTS"; print_blue
