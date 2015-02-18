@@ -4,7 +4,7 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM java:7
+FROM java:7-jre
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
 ENV CRATE_VERSION 0.47.3
@@ -21,8 +21,6 @@ ADD config/crate.yml /crate/config/crate.yml
 ADD config/logging.yml /crate/config/logging.yml
 
 ADD scripts/run.sh /usr/bin/crate
-ADD scripts/mesos.in.sh /usr/bin/mesos.in.sh
-ADD scripts/weave.in.sh /usr/bin/weave.in.sh
 
 WORKDIR /data
 
@@ -32,4 +30,3 @@ EXPOSE 4200
 EXPOSE 4300
 
 CMD ["crate"]
-
