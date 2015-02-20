@@ -12,15 +12,12 @@ RUN mkdir /crate && \
   wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
   | tar -xzC /crate --strip-components=1
 
-RUN mkdir -p /usr/bin
-ENV PATH /usr/bin:$PATH
+ENV PATH /crate/bin:$PATH
 
 VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/logging.yml /crate/config/logging.yml
-
-ADD scripts/run.sh /usr/bin/crate
 
 WORKDIR /data
 
