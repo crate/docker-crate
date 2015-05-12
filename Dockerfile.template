@@ -4,7 +4,7 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM java:7-jre
+FROM java:8-jre
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
 ENV CRATE_VERSION XXX

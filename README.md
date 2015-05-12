@@ -19,7 +19,7 @@ published to the public [Docker Hub Registry][4].
 
 ## Base Docker Image
 
-- [java:7-jre][5]
+- [java:8-jre][5]
 
 ## Installation
 
