@@ -7,9 +7,9 @@
 FROM java:8-jre
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
-ENV CRATE_VERSION 0.49.1
+ENV CRATE_VERSION 0.50.0
 RUN mkdir /crate && \
-  wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
+  wget -nv -O - "https://cdn.crate.io/downloads/releases/nightly/crate-0.50.0-201505230301-c217032.tar.gz" \
   | tar -xzC /crate --strip-components=1
 
 ENV PATH /crate/bin:$PATH
