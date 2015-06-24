@@ -1,3 +1,5 @@
+[![Stories in Ready](https://badge.waffle.io/RVN-BR/docker-crate.png?label=ready&title=Ready)](https://waffle.io/RVN-BR/docker-crate)
+[![Stories in Ready](https://badge.waffle.io/RVN-BR/docker-crate.png?label=ready&title=Ready)](https://waffle.io/RVN-BR/docker-crate)
 # What is Crate?
 
 Crate is _the_ distributed database for containerized environments, such as Docker.
