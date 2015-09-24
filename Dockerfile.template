@@ -21,9 +21,8 @@ ADD config/logging.yml /crate/config/logging.yml
 
 WORKDIR /data
 
-# http
-EXPOSE 4200
-# transport
-EXPOSE 4300
+# http: 4200 tcp
+# transport: 4300 tcp
+EXPOSE 4200 4300
 
 CMD ["crate"]
