@@ -99,6 +99,16 @@ the publish port to Crate.
               -Des.discovery.zen.ping.unicast.hosts=$HOSTS \
               -Des.discovery.zen.minimum_master_nodes=2
 
+## Crate Shell
+
+The Crate Shell (`crash`) is bundled with the Docker image. Since the `crash`
+executable is already in the `$PATH` environment variable, you can simply run:
+
+    docker run --rm -ti crate/crate crash --hosts [host1, host2, ...]
+
+Please refer to the [documentation][13] for usage instructions.
+
+
 # License
 
 View [license information][8] for the software contained in this image.
@@ -135,3 +145,4 @@ we need you to agree to our [CLA][11]. For further information please refer to [
 [10]: http://freenode.net
 [11]: https://crate.io/community/contribute/
 [12]: https://github.com/crate/crate/blob/master/CONTRIBUTING.rst
+[13]: https://crate.io/docs/projects/crash/en/latest/
