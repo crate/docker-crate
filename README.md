@@ -6,9 +6,9 @@ in a distributed design that allows you to query mountains of data in realtime, 
 
 We solve your data scaling problems and make administration a breeze.
 
-**Scale data as elastic as your application!**
+**Crate.IO - Put your data to work. Simply.**
 
-[Crate.IO Website][3]
+[http://crate.io][3]
 
 
 # Crate Dockerfile
@@ -27,11 +27,11 @@ published to the public [Docker Hub Registry][4].
 
 2. Download latest automated build from public [Docker Hub Registry][2]
 
-        docker pull crate/crate:latest
+    docker pull crate/crate:latest
 
-   alternatively you can build an image from `Dockerfile`:
+Alternatively you can build an image from `Dockerfile`:
 
-        docker build -t="crate/crate" github.com/crate/docker-crate
+    docker build -t="crate/crate" github.com/crate/docker-crate
 
 ## How to use this image
 
@@ -122,7 +122,7 @@ If you have any problems with, or questions about this image,
 please contact us through a [GitHub issue][9].
 
 If you have any questions or suggestions we would be very happy to help you.
-So, feel free to swing by our IRC channel `#crate` on [Freenode][10].
+So, feel free to join our [Crate Gitter Chat][10].
 
 For further information and official contact please visit [https://crate.io][3].
 
@@ -142,7 +142,7 @@ we need you to agree to our [CLA][11]. For further information please refer to [
 [7]: https://crate.io/docs/en/latest/best_practice/multi_node_setup.html
 [8]: https://github.com/crate/crate/blob/master/LICENSE.txt
 [9]: https://github.com/crate/docker-crate/issues
-[10]: http://freenode.net
+[10]: https://gitter.im/crate/crate
 [11]: https://crate.io/community/contribute/
 [12]: https://github.com/crate/crate/blob/master/CONTRIBUTING.rst
 [13]: https://crate.io/docs/projects/crash/en/latest/
