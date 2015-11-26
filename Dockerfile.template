@@ -4,13 +4,22 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM java:8-jre
+FROM alpine:3.2
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
 ENV CRATE_VERSION XXX
-RUN mkdir /crate && \
+
+RUN apk --update add openjdk8-jre-base && \
+  apk --update add ca-certificates && \
+  apk --update add python3 && \
+  apk --update add wget && \
+  apk --update add tar && \
+  ln -s /usr/bin/python3.5 /usr/bin/python && \
+  mkdir /crate && \
   wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
-  | tar -xzC /crate --strip-components=1
+  | tar -xzC /crate --strip-components=1 && \
+  rm -rf /var/cache/apk/*
+
 
 ENV PATH /crate/bin:$PATH
 
