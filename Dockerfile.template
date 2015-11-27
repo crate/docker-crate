@@ -8,6 +8,11 @@ FROM java:8-jre
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
 ENV CRATE_VERSION XXX
+RUN apt-get update && \
+    apt-get install -y python3 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt && \
+    ln -s /usr/bin/python3 /usr/bin/python
 RUN mkdir /crate && \
   wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
   | tar -xzC /crate --strip-components=1
