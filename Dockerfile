@@ -7,7 +7,7 @@
 FROM java:8-jre
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
-ENV CRATE_VERSION 0.52.3
+ENV CRATE_VERSION 0.53.1
 RUN apt-get update && \
     apt-get install -y python3 && \
     apt-get clean && \
