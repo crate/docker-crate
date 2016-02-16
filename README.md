@@ -122,7 +122,7 @@ If you have any problems with, or questions about this image,
 please contact us through a [GitHub issue][9].
 
 If you have any questions or suggestions we would be very happy to help you.
-So, feel free to join our [Crate Gitter Chat][10].
+So, feel free to join our [Crate.IO Slack Community][10].
 
 For further information and official contact please visit [https://crate.io][3].
 
@@ -142,7 +142,7 @@ we need you to agree to our [CLA][11]. For further information please refer to [
 [7]: https://crate.io/docs/en/latest/best_practice/multi_node_setup.html
 [8]: https://github.com/crate/crate/blob/master/LICENSE.txt
 [9]: https://github.com/crate/docker-crate/issues
-[10]: https://gitter.im/crate/crate
+[10]: https://crate.io/docs/support/slackin/
 [11]: https://crate.io/community/contribute/
 [12]: https://github.com/crate/crate/blob/master/CONTRIBUTING.rst
 [13]: https://crate.io/docs/projects/crash/en/latest/
