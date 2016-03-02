@@ -8,7 +8,6 @@ FROM java:8-jre
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
 RUN apt-get update && \
-    apt-get upgrade -y && \
     apt-get install -y python3 && \
     rm -rf /var/lib/apt && \
     ln -s /usr/bin/python3 /usr/bin/python
