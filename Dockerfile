@@ -15,19 +15,37 @@ RUN apk update && \
     rm -rf /var/cache/apk/* && \
     ln -s /usr/bin/python3 /usr/bin/python
 
-ENV CRATE_VERSION 0.54.6
-RUN wget -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
-  | tar -xzC / && mv /crate-$CRATE_VERSION /crate
 
+# tmp folder on Crate CDN
+ENV CDN_URL "https://cdn.crate.io/downloads/releases/tmp"
+# Crate version
+ENV CRATE_VERSION "0.55.0-201603070301-07b8045"
+ENV CRATE_URL "${CDN_URL}/crate-${CRATE_VERSION}.tar.gz"
+# Commoncrawl Plugin version
+ENV PLUGIN_VERSION "0.55.0-SNAPSHOT-e9f39af"
+ENV PLUGIN_URL "${CDN_URL}/crate-commoncrawl-${PLUGIN_VERSION}.jar"
+
+# download Crate
+RUN wget -O - ${CRATE_URL} | tar -xzC / && \
+    mv /crate-* /crate
+# remove unused plugins and download commoncrawl plugin
+RUN rm -rf /crate/plugins && \
+    mkdir -pv /crate/plugins/commoncrawl && \
+    wget -O /crate/plugins/commoncrawl/crate-commoncrawl-${PLUGIN_VERSION}.jar ${PLUGIN_URL}
+# ownership
 RUN addgroup crate && adduser -G crate -H crate -D && chown -R crate /crate
+
+# add executable to path
 ENV PATH /crate/bin:$PATH
 
-VOLUME ["/data"]
+# expose multiple mount points
+VOLUME /data1 /data2 /data3 /data4 /data5
 
+# add basic configuration
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/logging.yml /crate/config/logging.yml
 
-WORKDIR /data
+WORKDIR /crate
 
 # http: 4200 tcp
 # transport: 4300 tcp
