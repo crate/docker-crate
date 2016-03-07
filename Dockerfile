@@ -32,8 +32,6 @@ RUN wget -O - ${CRATE_URL} | tar -xzC / && \
 RUN rm -rf /crate/plugins && \
     mkdir -pv /crate/plugins/commoncrawl && \
     wget -O /crate/plugins/commoncrawl/crate-commoncrawl-${PLUGIN_VERSION}.jar ${PLUGIN_URL}
-# ownership
-RUN addgroup crate && adduser -G crate -H crate -D && chown -R crate /crate
 
 # add executable to path
 ENV PATH /crate/bin:$PATH
