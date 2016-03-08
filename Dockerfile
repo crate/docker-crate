@@ -22,7 +22,7 @@ ENV CDN_URL "https://cdn.crate.io/downloads/releases/tmp"
 ENV CRATE_VERSION "0.55.0-201603070301-07b8045"
 ENV CRATE_URL "${CDN_URL}/crate-${CRATE_VERSION}.tar.gz"
 # Commoncrawl Plugin version
-ENV PLUGIN_VERSION "0.55.0-SNAPSHOT-e9f39af"
+ENV PLUGIN_VERSION "1.1-SNAPSHOT"
 ENV PLUGIN_URL "${CDN_URL}/crate-commoncrawl-${PLUGIN_VERSION}.jar"
 
 # download Crate
