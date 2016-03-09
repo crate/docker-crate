@@ -4,22 +4,19 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM alpine:latest
+FROM java:8-jre
 MAINTAINER Crate Technology GmbH <office@crate.io>
 
-RUN echo 'http://nl.alpinelinux.org/alpine/latest-stable/community' >> /etc/apk/repositories
-RUN apk update && \
-    apk add openjdk8-jre-base && \
-    apk add openssl && \
-    apk add python3 && \
-    rm -rf /var/cache/apk/* && \
+RUN apt-get update && \
+    apt-get install -y python3 && \
+    rm -rf /var/lib/apt && \
     ln -s /usr/bin/python3 /usr/bin/python
 
 ENV CRATE_VERSION 0.54.6
-RUN wget -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
-  | tar -xzC / && mv /crate-$CRATE_VERSION /crate
+RUN mkdir /crate && \
+  wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
+  | tar -xzC /crate --strip-components=1
 
-RUN addgroup crate && adduser -G crate -H crate -D && chown -R crate /crate
 ENV PATH /crate/bin:$PATH
 
 VOLUME ["/data"]
