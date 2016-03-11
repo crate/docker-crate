@@ -12,7 +12,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt && \
     ln -s /usr/bin/python3 /usr/bin/python
 
-ENV CRATE_VERSION 0.54.6
+ENV CRATE_VERSION 0.54.7
 RUN mkdir /crate && \
   wget -nv -O - "https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz" \
   | tar -xzC /crate --strip-components=1
