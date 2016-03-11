@@ -25,7 +25,8 @@ ENV PLUGIN_URL "${CDN_URL}/crate-commoncrawl-${PLUGIN_VERSION}.jar"
 RUN mkdir -pv /crate && \
     wget -nv -O - ${CRATE_URL} | tar -xzC /crate --strip-components=1
 # remove unused plugins and download commoncrawl plugin
-RUN rm -rf /crate/plugins && \
+RUN rm -rf /crate/plugins/aws && \
+    rm -rf /crate/plugins/hdfs && \
     mkdir -pv /crate/plugins/commoncrawl && \
     wget -nv -O /crate/plugins/commoncrawl/crate-commoncrawl-${PLUGIN_VERSION}.jar ${PLUGIN_URL}
 
