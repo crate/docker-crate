@@ -15,7 +15,7 @@ RUN apt-get update && \
 # tmp folder on Crate CDN
 ENV CDN_URL "https://cdn.crate.io/downloads/releases/tmp"
 # Crate version
-ENV CRATE_VERSION "0.55.0-201603070301-07b8045"
+ENV CRATE_VERSION "0.55.0-201603160301-76d45ee"
 ENV CRATE_URL "${CDN_URL}/crate-${CRATE_VERSION}.tar.gz"
 # Commoncrawl Plugin version
 ENV PLUGIN_VERSION "1.3-SNAPSHOT"
