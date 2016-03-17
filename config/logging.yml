@@ -1,25 +1,23 @@
 # Logging config for Docker
-rootLogger: INFO, stdout, stderr
+rootLogger: WARN, console, file
 
 logger:
   # Log action execution errors for easier debugging
-  action: DEBUG
+  action: WARN
 
 appender:
 # configure stdout
-  stdout:
+  console:
+    threshold: ERROR
     type: console
-    threshold: DEBUG
-    target: System.out
     layout:
       type: consolePattern
       conversionPattern: "[%d{ISO8601}][%-5p][%-25c] %m%n"
 
-# configure stderr
-  stderr:
-    type: console
-    threshold: ERROR
-    target: System.err
+  file:
+    type: dailyRollingFile
+    file: ${path.logs}/${cluster.name}.log
+    datePattern: "'.'yyyy-MM-dd"
     layout:
-      type: consolePattern
+      type: pattern
       conversionPattern: "[%d{ISO8601}][%-5p][%-25c] %m%n"
