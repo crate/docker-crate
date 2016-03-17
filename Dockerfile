@@ -27,6 +27,9 @@ RUN mkdir -pv /crate && \
 # remove unused plugins and download commoncrawl plugin
 RUN rm -rf /crate/plugins/aws && \
     rm -rf /crate/plugins/hdfs && \
+    rm -rf /crate/lib/sigar/*.so && \
+    rm -rf /crate/lib/sigar/*.dylib && \
+    rm -rf /crate/lib/sigar/*.dll && \
     mkdir -pv /crate/plugins/commoncrawl && \
     wget -nv -O /crate/plugins/commoncrawl/crate-commoncrawl-${PLUGIN_VERSION}.jar ${PLUGIN_URL}
 
