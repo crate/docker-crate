@@ -36,7 +36,7 @@ RUN rm -rf /crate/plugins/aws && \
 # add executable to path
 ENV PATH /crate/bin:$PATH
 
-VOLUME ["/data"]
+VOLUME ["/data", "/data1", "/data2", "/data3"]
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/logging.yml /crate/config/logging.yml
