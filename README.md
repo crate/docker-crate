@@ -19,7 +19,7 @@ published to the public [Docker Hub Registry][4].
 
 ## Base Docker Image
 
-- [java:8-jre][5]
+- [alpine:latest][5]
 
 ## Installation
 
@@ -137,7 +137,7 @@ we need you to agree to our [CLA][11]. For further information please refer to [
 [2]: https://registry.hub.docker.com/u/crate/crate/
 [3]: https://crate.io
 [4]: https://registry.hub.docker.com/
-[5]: https://registry.hub.docker.com/_/java/
+[5]: https://hub.docker.com/_/alpine/
 [6]: https://crate.io/docs/stable/configuration.html
 [7]: https://crate.io/docs/en/latest/best_practice/multi_node_setup.html
 [8]: https://github.com/crate/crate/blob/master/LICENSE.txt
