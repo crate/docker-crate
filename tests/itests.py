@@ -49,14 +49,14 @@ class DockerBaseTestCase(TestCase):
         self.container = self.cli.create_container(
             image=self._layer.tag,
             command=cmd,
-            ports=ports.keys(),
+            ports=list(ports.keys()),
             environment=env,
             name=self.name
         )
         self.cli.start(self.name, port_bindings=ports)
         process = self.crate_process()
         sys.stdout.write('Waiting for Docker container ')
-        while not process.startswith('java'):
+        while not process.split()[0].endswith('java'):
             sys.stdout.write('.')
             time.sleep(0.1)
             process = self.crate_process()
@@ -83,6 +83,7 @@ class DockerBaseTestCase(TestCase):
 
     def crate_process(self):
         proc = self.info(u'Processes')
+        print(proc[0])
         return proc and proc[0][2] or ''
 
     def logs(self):
