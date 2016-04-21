@@ -25,10 +25,10 @@ class DockerBaseTestCase(TestCase):
 
     def connect(self, port=4200):
         crate_ip = '127.0.0.1'
-        if self.cli.info()['Name'] == u'boot2docker':
+        if self.cli.info()['OperatingSystem'].startswith(u'Boot2Docker'):
             import subprocess;
-            crate_ip = subprocess.check_output(r'boot2docker ip',
-                stderr=None, shell=True).strip('\n')
+            crate_ip = subprocess.check_output(r'docker-machine ip',
+                stderr=None, shell=True).decode("utf-8").strip('\n')
         return connect(['{0}:{1}'.format(crate_ip, str(port))])
 
     def setUp(self):
@@ -49,14 +49,14 @@ class DockerBaseTestCase(TestCase):
         self.container = self.cli.create_container(
             image=self._layer.tag,
             command=cmd,
-            ports=ports.keys(),
+            ports=list(ports.keys()),
             environment=env,
             name=self.name
         )
         self.cli.start(self.name, port_bindings=ports)
         process = self.crate_process()
         sys.stdout.write('Waiting for Docker container ')
-        while not process.startswith('java'):
+        while not process.split()[0].endswith('java'):
             sys.stdout.write('.')
             time.sleep(0.1)
             process = self.crate_process()
@@ -91,7 +91,7 @@ class DockerBaseTestCase(TestCase):
     def wait_for_cluster(self):
         print('Waiting for Crate to start ...')
         for line in self.cli.logs(self.name, stream=True):
-            l = line.strip('\n').strip()
+            l = line.decode("utf-8").strip('\n').strip()
             print(l)
             if l.endswith('started'):
                 break
@@ -114,10 +114,9 @@ class SimpleRunTest(DockerBaseTestCase):
     @docker(['crate'], ports={}, env=[])
     def testRun(self):
         self.wait_for_cluster()
-        lg = self.logs().split('\n')
+        lg = self.logs().decode("utf-8").split('\n')
         self.assertTrue(lg[-3:][0].endswith('(elected_as_master)'))
         self.assertTrue(lg[-2:][0].endswith('started'))
-
 
 class JavaPropertiesTest(DockerBaseTestCase):
     """
@@ -140,19 +139,14 @@ class JavaPropertiesTest(DockerBaseTestCase):
 
 class EnvironmentVariablesTest(DockerBaseTestCase):
     """
-    docker run -p 4200:4200 --env CRATE_HEAP_SIZE=1g --env CRATE_HOSTS=127.0.0.1:4300 crate crate
+    docker run -p 4200:4200 --env CRATE_HEAP_SIZE=1048576000 crate crate
     """
 
-    @docker(['crate'], ports={4200:4200}, env=['CRATE_HEAP_SIZE=1g', 'CRATE_HOSTS=127.0.0.1:4300'])
+    @docker(['crate'], ports={4200:4200}, env=['CRATE_HEAP_SIZE=1048576000'])
     def testRun(self):
         self.wait_for_cluster()
-        cursor = self.connect().cursor()
-        cursor.execute('''select heap['max'] from sys.nodes''')
-        res = cursor.fetchall()
-        self.assertEqual(res[0][0], 1038876672)
         # check process arguments
         process = self.crate_process()
-        res = re.findall(r'-Des[\S]+', process)
-        self.assertTrue('-Des.multicast.enabled=false', res[0])
-        self.assertTrue('-Des.discovery.zen.ping.unicast.hosts=127.0.0.1:4300', res[1])
-
+        res = re.findall(r'-Xmx[\S]+', process)
+        self.assertTrue('1048576000', res[0][-10:])
+        

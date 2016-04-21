@@ -53,7 +53,7 @@ class DockerLayer(object):
         for line in self.client.build(
                 path=os.path.abspath(os.path.join(DIR, '..')),
                 tag=self.tag, rm=True, forcerm=True):
-            sys.stdout.write(line)
+            sys.stdout.write(line.decode('utf-8'))
 
     def tearDown(self):
         self.stop()
