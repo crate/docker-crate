@@ -19,7 +19,8 @@ from requests.exceptions import ConnectionError
 from docker import Client
 from docker.utils import kwargs_from_env
 
-from itests import SimpleRunTest, JavaPropertiesTest, EnvironmentVariablesTest
+from itests import SimpleRunTest, JavaPropertiesTest, \
+    EnvironmentVariablesTest, SigarStatsTest
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +69,7 @@ def test_suite():
     suite.addTest(SimpleRunTest(docker_layer))
     suite.addTest(JavaPropertiesTest(docker_layer))
     suite.addTest(EnvironmentVariablesTest(docker_layer))
+    suite.addTest(SigarStatsTest(docker_layer))
     suite.layer = docker_layer
     return suite
 

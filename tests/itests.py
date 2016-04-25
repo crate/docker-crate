@@ -149,4 +149,25 @@ class EnvironmentVariablesTest(DockerBaseTestCase):
         process = self.crate_process()
         res = re.findall(r'-Xmx[\S]+', process)
         self.assertTrue('1048576000', res[0][-10:])
-        
+
+
+class SigarStatsTest(DockerBaseTestCase):
+    """
+    docker run -p 4200:4200 crate crate
+    """
+
+    @docker(['crate'], ports={4200:4200}, env=[])
+    def testRun(self):
+        self.wait_for_cluster()
+        cursor = self.connect().cursor()
+
+        cursor.execute("select os['cpu'] from sys.nodes limit 1")
+        self.assert_not_fallback_values(cursor.fetchall())
+
+        cursor.execute("select mem from sys.nodes limit 1")
+        self.assert_not_fallback_values(cursor.fetchall())
+
+    def assert_not_fallback_values(self, result):
+        for entry in result:
+            for _, value in entry[0].items():
+                self.assertNotEqual(value, -1)
