@@ -145,10 +145,11 @@ class EnvironmentVariablesTest(DockerBaseTestCase):
     @docker(['crate'], ports={4200:4200}, env=['CRATE_HEAP_SIZE=1048576000'])
     def testRun(self):
         self.wait_for_cluster()
-        # check process arguments
+        # check -Xmx and -Xms process arguments
         process = self.crate_process()
-        res = re.findall(r'-Xmx[\S]+', process)
-        self.assertTrue('1048576000', res[0][-10:])
+        res = re.findall(r'-Xm[\S]+', process)
+        self.assertEqual('1048576000', res[0][len('-Xmx'):])
+        self.assertEqual('1048576000', res[0][len('-Xms'):])
 
 
 class SigarStatsTest(DockerBaseTestCase):
