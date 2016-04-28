@@ -9,6 +9,7 @@ MAINTAINER Crate.IO GmbH office@crate.io
 
 ENV ANT_VERSION 1.9.7
 ENV CRATE_VERSION 0.54.8
+ENV SIGAR_VERSION 1.6.4
 
 RUN addgroup crate && adduser -G crate -H crate -D
 
@@ -36,7 +37,7 @@ RUN set -ex \
     && gpg --import KEYS \
     && gpg --verify apache-ant-$ANT_VERSION-bin.tar.gz.asc \
     && tar -zxf apache-ant-$ANT_VERSION-bin.tar.gz \
-    && git clone https://github.com/hyperic/sigar.git --single-branch --branch sigar-1.6.4 sigar \
+    && git clone https://github.com/hyperic/sigar.git --single-branch --branch sigar-$SIGAR_VERSION sigar \
     && cd sigar \
     && git apply /var/tmp/sigar_build.patch \
     && cd bindings/java \
