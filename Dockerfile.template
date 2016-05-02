@@ -61,11 +61,11 @@ RUN apk add --no-cache --virtual .crate-rundeps openjdk8-jre-base python3 openss
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver keyserver.ubuntu.com --recv-keys 7faae51a06f6eaeb \
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 7faae51a06f6eaeb \
     && gpg --batch --verify crate-$CRATE_VERSION.tar.gz.asc crate-$CRATE_VERSION.tar.gz \
     && rm -r "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
     && mkdir /crate \
-    && tar -xvf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
+    && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && ln -s /usr/bin/python3 /usr/bin/python \
     && cp -f /usr/local/lib/*.so /crate/lib/sigar/ \
     && chown -R crate /crate \
