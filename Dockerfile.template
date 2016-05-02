@@ -27,8 +27,8 @@ RUN set -ex \
         openjdk8 \
         gnupg \
         perl \
-    && mkdir /build \
-    && cd /build \
+    && BUILD_DIR=$(mktemp -d) \
+    && cd $BUILD_DIR \
     && curl -fSL https://www.apache.org/dist/ant/KEYS -o KEYS \
     && curl -fSL -O https://www.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz.asc \
     && curl -fSL -O http://apache.uib.no//ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz \
@@ -41,7 +41,7 @@ RUN set -ex \
     && cd sigar \
     && git apply /var/tmp/sigar_build.patch \
     && cd bindings/java \
-    && /build/apache-ant-$ANT_VERSION/bin/ant \
+    && $BUILD_DIR/apache-ant-$ANT_VERSION/bin/ant \
     && find build -name '*.so*' | xargs install -t /usr/local/lib \
     && runDeps="$( \
         scanelf --needed --nobanner --recursive /usr/local \
@@ -52,16 +52,24 @@ RUN set -ex \
     )" \
     && apk add --no-cache --virtual .libsigar-rundeps $runDeps \
     && apk del .build-deps \
-    && rm -rf /build
+    && rm -rf $BUILD_DIR
 
 # install crate
 ENV CRATE_VERSION XXX
 RUN apk add --no-cache --virtual .crate-rundeps openjdk8-jre-base python3 openssl \
-    && wget -O - https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
-        | tar -xzC / && mv /crate-$CRATE_VERSION /crate \
+    && apk add --no-cache --virtual .build-deps curl gnupg tar \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
+    && export GNUPGHOME="$(mktemp -d)" \
+    && gpg --keyserver keyserver.ubuntu.com --recv-keys 7faae51a06f6eaeb \
+    && gpg --batch --verify crate-$CRATE_VERSION.tar.gz.asc crate-$CRATE_VERSION.tar.gz \
+    && rm -r "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
+    && mkdir /crate \
+    && tar -xvf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && ln -s /usr/bin/python3 /usr/bin/python \
     && cp -f /usr/local/lib/*.so /crate/lib/sigar/ \
-    && chown -R crate /crate
+    && chown -R crate /crate \
+    && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
 
