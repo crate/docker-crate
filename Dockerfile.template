@@ -8,7 +8,6 @@ FROM alpine:3.3
 MAINTAINER Crate.IO GmbH office@crate.io
 
 ENV ANT_VERSION 1.9.7
-ENV CRATE_VERSION XXX
 ENV SIGAR_VERSION 1.6.4
 
 RUN addgroup crate && adduser -G crate -H crate -D
@@ -17,7 +16,6 @@ ADD sigar/sigar_build.patch /var/tmp/
 
 # build sigar library
 RUN set -ex \
-    && apk update \
     && apk add --no-cache --virtual .build-deps \
         tar \
         git \
@@ -34,8 +32,10 @@ RUN set -ex \
     && curl -fSL https://www.apache.org/dist/ant/KEYS -o KEYS \
     && curl -fSL -O https://www.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz.asc \
     && curl -fSL -O http://apache.uib.no//ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz \
+    && export GNUPGHOME="$(mktemp -d)" \
     && gpg --import KEYS \
-    && gpg --verify apache-ant-$ANT_VERSION-bin.tar.gz.asc \
+    && gpg --batch --verify apache-ant-$ANT_VERSION-bin.tar.gz.asc apache-ant-$ANT_VERSION-bin.tar.gz \
+    && rm -r "$GNUPGHOME" apache-ant-$ANT_VERSION-bin.tar.gz.asc \
     && tar -zxf apache-ant-$ANT_VERSION-bin.tar.gz \
     && git clone https://github.com/hyperic/sigar.git --single-branch --branch sigar-$SIGAR_VERSION sigar \
     && cd sigar \
@@ -55,6 +55,7 @@ RUN set -ex \
     && rm -rf /build
 
 # install crate
+ENV CRATE_VERSION XXX
 RUN apk add --no-cache --virtual .crate-rundeps openjdk8-jre-base python3 openssl \
     && wget -O - https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
         | tar -xzC / && mv /crate-$CRATE_VERSION /crate \
