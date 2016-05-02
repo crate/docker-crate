@@ -1,148 +1,192 @@
-# What is Crate?
+*This is Crate.IO's own repository featuring the latest builds. The
+official images can be found [here](https://hub.docker.com/_/crate/)*
 
-Crate is _the_ distributed database for containerized environments, such as Docker.
-Based on the familiar SQL syntax, Crate combines high availability, resiliency, and scalability
-in a distributed design that allows you to query mountains of data in realtime, not batches.
+# What Is Crate?
 
-We solve your data scaling problems and make administration a breeze.
+Crate is an open source fast, scalable, easy to use SQL database that plays
+nicely with containers like Docker. It feels like the SQL databases you know,
+but makes scaling and operating your database ridiculously easy - regardless of
+the volume, complexity, or type of data. It ingests millions of records per
+second for time series setups and delivers analytics results in sub-second real
+time.
 
-**Crate.IO - Put your data to work. Simply.**
+Crate comes with a distributed sort and aggregation engine, fast multi index
+queries, native full-text search and super simple scalability with sharding and
+partitioning builtin. Preconfigured replication takes care of data resiliency.
+The cluster management can be supervised with a built-in admin UI. Crate's
+masterless architecture and simplicity make the data part of Docker environments
+easy and elegant.
 
-[http://crate.io][3]
+Crate provides several installation packages, including a supported Docker
+image. It fits perfectly into an orchestrated microservices environment. It acts
+like an omnipresent, persistent layer for data. Application
+containers access their data regardless of which host the data nodes run.
+
+[Crate](https://crate.io/)
 
 
-# Crate Dockerfile
+![logo](https://raw.githubusercontent.com/docker-library/docs/2517900006ae5f4c03c1d43235930c59f4614394/crate/logo.png)
 
-This repository contains **Dockerfile** of [Crate][3] for [Docker][1]'s [automated build][2]
-published to the public [Docker Hub Registry][4].
+# Quick Start Example: Multihost Production Setup
 
+This is an example configuration to run in a multi-host production environment.
+The configuration includes the required minimum settings:
+ - Volume mapping
+ - Port mapping to localhost (run only one container per machine)
+ - Unicast host discovery
 
-## Base Docker Image
+To start the Crate cluster in containers distributed to three hosts without
+multicast enabled, run this command on the first node and adapt the container
+and node names on the two other nodes:
 
-- [alpine:latest][5]
+```console
+# HOSTS="crate1.example.com:4300,crate2.example.com:4300,crate3.example.com:4300"
+# HOST="crate1.example.com"
+# docker run -d -p 4200:4200 -p 4300:4300 \
+    --name crate1-container \
+    --volume /mnt/data:/data \
+    --env CRATE_HEAP_SIZE=8g \
+        crate/crate:latest \
+          -Des.cluster.name=crate-cluster \
+          -Des.node.name=crate1 \
+          -Des.transport.publish_port=4300 \
+          -Des.network.publish_host="$HOST" \
+          -Des.multicast.enabled=false \
+          -Des.discovery.zen.ping.unicast.hosts="$HOSTS" \
+          -Des.discovery.zen.minimum_master_nodes=2
+```
 
-## Installation
+# The crate/crate Docker Image
 
-1. Install [Docker][1]
+To form a cluster from scratch, start a few instances of the Crate container as a background
+daemon:
 
-2. Download latest automated build from public [Docker Hub Registry][2]
+```console
+# docker run -d crate/crate
+```
 
-    docker pull crate/crate:latest
+To access the admin UI, map port 4200 and point your browser to port tcp/4200 of
+a node of your choice while you start it or look up its IP later:
 
-Alternatively you can build an image from `Dockerfile`:
+```console
+# firefox "http://$(docker inspect --format='{{.NetworkSettings.IPAddress}}' $(docker run -d crate/crate)):4200/admin"
+```
 
-    docker build -t="crate/crate" github.com/crate/docker-crate
+For production use it's strongly recommended to use only one container per
+machine. This will give the best possible performance and by mapping
+the ports from the Docker container to the host it acts like a native
+installation. Crate's default ports 4200 (HTTP) and 4300 (Transport protocol).
 
-## How to use this image
+```console
+# docker run -d -p 4200:4200 -p 4300:4300 crate/crate
+```
 
-    docker run -d -p 4200:4200 -p 4300:4300 crate/crate:latest
+## Attach Persistent Data Directory
 
-### Attach persistent data directory
+Crate stores all important data in _/data_. It's advised to mount this
+directory to avoid writing within the docker image:
 
-    docker run -d -p 4200:4200 -p 4300:4300 -v <data-dir>:/data crate/crate
+```console
+# docker run -d -v <data-dir>:/data crate/crate
+```
 
-### Use custom Crate configuration
+## Use Custom Crate Configuration
 
-    docker run -d -p 4200:4200 -p 4300:4300 crate/crate crate -Des.config=/path/to/crate.yml
+Crate is controlled by a single configuration file which has sensible defaults
+already. If you derive your container from the Crate container, make sure to
+place your file inside it and let Crate know where to find it:
 
-Any configuration settings may be specified upon startup using the `-D` option prefix.
-For example, configuring the cluster name by using system properties will work this way::
+```console
+# docker run -d crate/crate -Des.config=</path/to>/crate.yml
+```
 
-    docker run -d -p 4200:4200 -p 4300:4300 crate/crate crate -Des.cluster.name=cluster
+Other configuration settings may be specified upon startup using the `-D` option
+prefix. For example, configuring the cluster name by using system properties
+works like this:
 
-For further configuration options please refer to the [Configuration][6] section of the online documentation.
+```console
+# docker run -d crate/crate -Des.cluster.name=<my-cluster-name>
+```
 
-### Environment
+For further configuration options refer to the
+[Configuration](https://crate.io/docs/stable/configuration.html) section of our
+documentation.
 
-To set environment variables for Crate you need to use the ``--env`` option when starting
-the docker image.
+## Environment
 
-For example, setting the heap size:
+Crate recognizes environment variables like `CRATE_HEAP_SIZE` that need to be
+set with the `--env` option before the actual Crate core starts. You may want to
+[assign about half of your memory
+it](https://crate.io/docs/reference/en/latest/configuration.html#crate-heap-size)
+as a rule of thumb to Crate:
 
-    docker run -d -p 4200:4200 -p 4300:4300 --env CRATE_HEAP_SIZE=32g crate/crate
+```console
+# docker run -d --env CRATE_HEAP_SIZE=32g crate/crate
+```
+
+## Open Files
+
+Depending on the size of your installation, Crate can open a lot of files. You
+can check the number of open files with `ulimit -n`, but it can depend on your
+host operating system. To increase the number, start containers with the option
+`--ulimit nofile=65535:65535`:
 
 ## Multicast
 
-Crate uses multicast for node discovery by default. However, Docker does only support multicast on the same
-host. This means that nodes that are started on the same host will discover each other automatically,
-but nodes that are started on different hosts need unicast enabled.
+By Default, Crate uses multicast for node discovery. This means nodes started in
+the same multicast zone will discover each other automatically. Docker multicast
+support between containers on different hosts depends on an overlay network
+driver. If that does not support multicast, you have to [enable unicast in a
+custom
+_crate.yml_](https://crate.io/docs/reference/best_practice/multi_node_setup.html)
+file.
 
-You can enable unicast in your custom ``crate.yml``. See also: [Using Crate in a Multi Node Setup][7].
+Crate publishes the hostname it runs on for discovery within the cluster. If the
+address of the docker container differs from the actual host the docker image is
+running on, this is the case if you do port mapping to the host via the `-p`
+option, you need to tell Crate to publish the address of the docker host
+instead:
 
-Due to its architecture, Crate publishes the host it runs on for discovery within the cluster. Since
-the address of the host inside the docker container differs from the actual host the docker image is
-running on, you need to tell Crate to publish the address of the docker host for discovery.
+```console
+# docker run -d -p 4200:4200 -p 4300:4300 \
+    crate/crate -Des.network.publish_host=host1.example.com
+```
 
-    docker run -d -p 4200:4200 -p 4300:4300 crate/crate crate -Des.network.publish_host=host1.example.com:
-
-If you change the transport port from the default ``4300`` to something else, you also need to pass
-the publish port to Crate.
-
-    docker run -d -p 4200:4200 -p 4321:4300 crate/crate crate -Des.transport.publish_port=4321
-
-### Example Usage in a Multinode Setup
-
-    HOSTS='crate1.example.com:4300,crate2.example.com:4300,crate3.example.com:4300'
-    HOST=crate1.example.com
-    docker run -d \
-        -p 4200:4200 \
-        -p 4300:4300 \
-        --name node1 \
-        --volume /mnt/data:/data \
-        --env CRATE_HEAP_SIZE=8g \
-        crate/crate:latest \
-        crate -Des.cluster.name=cratecluster \
-              -Des.node.name=crate1 \
-              -Des.transport.publish_port=4300 \
-              -Des.network.publish_host=$HOST \
-              -Des.multicast.enabled=false \
-              -Des.discovery.zen.ping.unicast.hosts=$HOSTS \
-              -Des.discovery.zen.minimum_master_nodes=2
+If you change the transport port from the default `4300` to something else, you
+need to pass the publish port to Crate by adding
+`-Des.transport.publish_port=4321` to your command.
 
 ## Crate Shell
 
-The Crate Shell (`crash`) is bundled with the Docker image. Since the `crash`
-executable is already in the `$PATH` environment variable, you can simply run:
+The Crate Shell `crash` is bundled with the Docker image. Since the `crash`
+executable is already in the `$PATH` environment variable, simply run:
 
-    docker run --rm -ti crate/crate crash --hosts [host1, host2, ...]
+```console
+# docker run --rm -ti crate/crate crash --hosts [host1, host2, ...]
+```
 
-Please refer to the [documentation][13] for usage instructions.
+# Documentation
 
+Documentation for this image is stored in the [`crate/` directory](https://github.com/docker-library/docs/tree/master/crate) of the [`docker-library/docs` GitHub repo](https://github.com/docker-library/docs). Be sure to familiarize yourself with the [repository's `REAMDE.md` file](https://github.com/docker-library/docs/blob/master/README.md) before attempting a pull request.
+
+Visit [Crate on Docker](https://crate.io/docs/install/containers/docker/) and get further documentation about how to get started with Crate.
+
+# Issues
+
+If you have any problems with or questions about this image, please
+contact us through a [GitHub issue](https://github.com/crate/docker-crate/issues).
+
+
+If you have any questions or suggestions, we are happy to help! Feel
+free to join our [public Crate community on Slack](https://crate.io/docs/support/slackin/).
+
+For further information and official contact visit
+[https://crate.io](https://crate.io).
+
+# Contributing
+
+You are very welcome to contribute features or fixes! Before we can accept any pull requests to Crate Data we need you to agree to our [CLA](https://crate.io/community/contribute/). For further information please refer to [CONTRIBUTING.rst](https://github.com/crate/crate/blob/master/CONTRIBUTING.rst).
 
 # License
 
-View [license information][8] for the software contained in this image.
-
-
-# User Feedback
-
-## Issues
-
-If you have any problems with, or questions about this image,
-please contact us through a [GitHub issue][9].
-
-If you have any questions or suggestions we would be very happy to help you.
-So, feel free to join our [Crate.IO Slack Community][10].
-
-For further information and official contact please visit [https://crate.io][3].
-
-## Contributing
-
-You are very welcome to contribute features or fixes! Before we can accept any pull requests to Crate
-we need you to agree to our [CLA][11]. For further information please refer to [CONTRIBUTING.rst][12].
-
-
-
-[1]: https://www.docker.com
-[2]: https://registry.hub.docker.com/u/crate/crate/
-[3]: https://crate.io
-[4]: https://registry.hub.docker.com/
-[5]: https://hub.docker.com/_/alpine/
-[6]: https://crate.io/docs/stable/configuration.html
-[7]: https://crate.io/docs/en/latest/best_practice/multi_node_setup.html
-[8]: https://github.com/crate/crate/blob/master/LICENSE.txt
-[9]: https://github.com/crate/docker-crate/issues
-[10]: https://crate.io/docs/support/slackin/
-[11]: https://crate.io/community/contribute/
-[12]: https://github.com/crate/crate/blob/master/CONTRIBUTING.rst
-[13]: https://crate.io/docs/projects/crash/en/latest/
+View [license information](https://github.com/crate/crate/blob/master/LICENSE.txt) for the software contained in this image.
