@@ -1,1 +1,1 @@
-Crate is a distributed database especially designed for containerized environments such as Docker.
+Crate is a shared nothing, fully searchable, SQL database with the NoSQL goodies.
