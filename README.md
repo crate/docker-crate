@@ -45,8 +45,11 @@ and node names on the two other nodes:
 # docker run -d -p 4200:4200 -p 4300:4300 \
     --name crate1-container \
     --volume /mnt/data:/data \
+    --ulimit nofile=65535 \
+    --ulimit memlock=9223372036854775807 \
     --env CRATE_HEAP_SIZE=8g \
         crate/crate:latest \
+        crate \
           -Des.cluster.name=crate-cluster \
           -Des.node.name=crate1 \
           -Des.transport.publish_port=4300 \
@@ -62,14 +65,14 @@ To form a cluster from scratch, start a few instances of the Crate container as 
 daemon:
 
 ```console
-# docker run -d crate/crate
+# docker run -d crate/crate crate
 ```
 
 To access the admin UI, map port 4200 and point your browser to port tcp/4200 of
 a node of your choice while you start it or look up its IP later:
 
 ```console
-# firefox "http://$(docker inspect --format='{{.NetworkSettings.IPAddress}}' $(docker run -d crate/crate)):4200/admin"
+# firefox "http://$(docker inspect --format='{{.NetworkSettings.IPAddress}}' $(docker run -d crate/crate crate)):4200/admin"
 ```
 
 For production use it's strongly recommended to use only one container per
@@ -78,7 +81,7 @@ the ports from the Docker container to the host it acts like a native
 installation. Crate's default ports 4200 (HTTP) and 4300 (Transport protocol).
 
 ```console
-# docker run -d -p 4200:4200 -p 4300:4300 crate/crate
+# docker run -d -p 4200:4200 -p 4300:4300 crate/crate crate
 ```
 
 ## Attach Persistent Data Directory
@@ -87,7 +90,7 @@ Crate stores all important data in _/data_. It's advised to mount this
 directory to avoid writing within the docker image:
 
 ```console
-# docker run -d -v <data-dir>:/data crate/crate
+# docker run -d -v <data-dir>:/data crate/crate crate
 ```
 
 ## Use Custom Crate Configuration
@@ -97,7 +100,7 @@ already. If you derive your container from the Crate container, make sure to
 place your file inside it and let Crate know where to find it:
 
 ```console
-# docker run -d crate/crate -Des.config=</path/to>/crate.yml
+# docker run -d crate/crate crate -Des.config=</path/to>/crate.yml
 ```
 
 Other configuration settings may be specified upon startup using the `-D` option
@@ -105,7 +108,7 @@ prefix. For example, configuring the cluster name by using system properties
 works like this:
 
 ```console
-# docker run -d crate/crate -Des.cluster.name=<my-cluster-name>
+# docker run -d crate/crate crate -Des.cluster.name=<my-cluster-name>
 ```
 
 For further configuration options refer to the
@@ -121,7 +124,7 @@ it](https://crate.io/docs/reference/en/latest/configuration.html#crate-heap-size
 as a rule of thumb to Crate:
 
 ```console
-# docker run -d --env CRATE_HEAP_SIZE=32g crate/crate
+# docker run -d --env CRATE_HEAP_SIZE=32g crate/crate crate
 ```
 
 ## Open Files
@@ -129,7 +132,9 @@ as a rule of thumb to Crate:
 Depending on the size of your installation, Crate can open a lot of files. You
 can check the number of open files with `ulimit -n`, but it can depend on your
 host operating system. To increase the number, start containers with the option
-`--ulimit nofile=65535:65535`:
+`--ulimit nofile=65535`. Furthermore it is recommended to set the `memlock` limit
+(the maximum locked-in-memory address space) to unlimited by setting it to a
+very high number (Docker requires a 64 bit integer) `--ulimit memlock=9223372036854775807`.
 
 ## Multicast
 
@@ -149,7 +154,7 @@ instead:
 
 ```console
 # docker run -d -p 4200:4200 -p 4300:4300 \
-    crate/crate -Des.network.publish_host=host1.example.com
+    crate/crate crate -Des.network.publish_host=host1.example.com
 ```
 
 If you change the transport port from the default `4300` to something else, you
