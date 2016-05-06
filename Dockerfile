@@ -31,7 +31,7 @@ RUN set -ex \
     && cd $BUILD_DIR \
     && curl -fSL https://www.apache.org/dist/ant/KEYS -o KEYS \
     && curl -fSL -O https://www.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz.asc \
-    && curl -fSL -O http://apache.uib.no//ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz \
+    && curl -fSL -O https://www-us.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --import KEYS \
     && gpg --batch --verify apache-ant-$ANT_VERSION-bin.tar.gz.asc apache-ant-$ANT_VERSION-bin.tar.gz \
@@ -61,7 +61,7 @@ RUN apk add --no-cache --virtual .crate-rundeps openjdk8-jre-base python3 openss
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 7faae51a06f6eaeb \
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
     && gpg --batch --verify crate-$CRATE_VERSION.tar.gz.asc crate-$CRATE_VERSION.tar.gz \
     && rm -r "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
     && mkdir /crate \
