@@ -9,7 +9,8 @@ MAINTAINER Crate.IO GmbH office@crate.io
 
 RUN addgroup crate && adduser -G crate -H crate -D
 
-RUN echo 'http://dl-5.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
+RUN cat /etc/apk/repositories
+RUN echo http://dl-cdn.alpinelinux.org/alpine/v3.4/community >> /etc/apk/repositories
 
 # install crate
 ENV CRATE_VERSION 0.54.8
@@ -18,7 +19,7 @@ RUN    apk add --no-cache --virtual .crate-rundeps openjdk8-jre-base python3 ope
     && curl -fSLsO https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
     && curl -fSLsO https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 7faae51a06f6eaeb \
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 90c23fc6585bc0717f8fbfc37faae51a06f6eaeb \
     && gpg --batch --verify crate-$CRATE_VERSION.tar.gz.asc crate-$CRATE_VERSION.tar.gz \
     && rm -rf "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
     && mkdir /crate \
