@@ -55,7 +55,7 @@ RUN set -ex \
     && rm -rf $BUILD_DIR
 
 # install crate
-ENV CRATE_VERSION 0.54.9
+ENV CRATE_VERSION 0.55.0
 RUN apk add --no-cache --virtual .crate-rundeps openjdk8-jre-base python3 openssl \
     && apk add --no-cache --virtual .build-deps curl gnupg tar \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
