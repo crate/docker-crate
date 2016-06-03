@@ -115,8 +115,6 @@ class SimpleRunTest(DockerBaseTestCase):
     def testRun(self):
         self.wait_for_cluster()
         lg = self.logs().decode("utf-8").split('\n')
-        print(lg[-3:][0])
-        print(lg[-2:][0])
         self.assertTrue('elected_as_master' in lg[-3:][0])
         self.assertTrue(lg[-2:][0].endswith('started'))
 
