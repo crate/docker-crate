@@ -64,11 +64,11 @@ RUN apk add --no-cache --virtual .crate-rundeps openjdk8-jre-base python3 openss
     && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
     && gpg --batch --verify crate-$CRATE_VERSION.tar.gz.asc crate-$CRATE_VERSION.tar.gz \
     && rm -r "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
-    && mkdir /crate \
+    && mkdir /crate /data \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && ln -s /usr/bin/python3 /usr/bin/python \
-    && cp -f /usr/local/lib/*.so /crate/lib/sigar/ \
-    && chown -R crate /crate \
+    && cp -f /usr/local/lib/*.so /crate/plugins/sigar/lib/ \
+    && chown -R crate /crate /data \
     && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
@@ -77,6 +77,8 @@ VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/logging.yml /crate/config/logging.yml
+
+USER crate
 
 WORKDIR /data
 
