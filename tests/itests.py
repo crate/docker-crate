@@ -115,7 +115,7 @@ class SimpleRunTest(DockerBaseTestCase):
     def testRun(self):
         self.wait_for_cluster()
         lg = self.logs().decode("utf-8").split('\n')
-        self.assertTrue(lg[-3:][0].endswith('(elected_as_master)'))
+        self.assertTrue('elected_as_master' in lg[-3:][0])
         self.assertTrue(lg[-2:][0].endswith('started'))
 
 class JavaPropertiesTest(DockerBaseTestCase):
@@ -162,7 +162,7 @@ class SigarStatsTest(DockerBaseTestCase):
         self.wait_for_cluster()
         cursor = self.connect().cursor()
 
-        cursor.execute("select os['cpu'] from sys.nodes limit 1")
+        cursor.execute("select load from sys.nodes limit 1")
         self.assert_not_fallback_values(cursor.fetchall())
 
         cursor.execute("select mem from sys.nodes limit 1")
