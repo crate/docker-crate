@@ -67,7 +67,7 @@ RUN apk add --no-cache --virtual .crate-rundeps openjdk8-jre-base python3 openss
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && ln -s /usr/bin/python3 /usr/bin/python \
-    && cp -f /usr/local/lib/*.so /crate/lib/sigar/ \
+    && cp -f /usr/local/lib/*.so /crate/plugins/sigar/lib/ \
     && chown -R crate /crate \
     && apk del .build-deps
 
