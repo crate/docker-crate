@@ -7,14 +7,15 @@
 FROM alpine:3.4
 MAINTAINER Crate.IO GmbH office@crate.io
 
-ENV GOSU_VERSION 1.7
+ENV GOSU_VERSION 1.9
 RUN set -x \
     && apk add --no-cache --virtual .gosu-deps \
         dpkg \
         gnupg \
-        openssl \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+        curl \
+    && export ARCH=$(echo $(dpkg --print-architecture) | cut -d"-" -f3) \
+    && curl -o /usr/local/bin/gosu -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH" \
+    && curl -o /usr/local/bin/gosu.asc -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
@@ -45,7 +46,7 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && ln -s /usr/bin/python3 /usr/bin/python \
-    && cp -f /usr/lib/libsigar-amd64-linux.so /crate/plugins/sigar/lib/ \
+    && rm /crate/plugins/sigar/lib/libsigar-amd64-linux.so \
     && chown -R crate /crate \
     && apk del .build-deps
 
