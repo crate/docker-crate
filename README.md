@@ -95,21 +95,14 @@ directory to avoid writing within the docker image:
 
 ## Use Custom Crate Configuration
 
-Crate is controlled by a single configuration file which has sensible defaults
-already. If you derive your container from the Crate container, make sure to
-place your file inside it and let Crate know where to find it:
+Starting with 0.55.0, Crate does no longer support providing custom
+configuration files. However it is still possible to mount Crate's configuration
+into `/crate/config/crate.yml`.
 
 ```console
-# docker run -d crate/crate crate -Des.config=</path/to>/crate.yml
+# docker run -d -v <custom/config/path>/crate.yml:/crate/config/crate.yml crate/crate crate
 ```
 
-Other configuration settings may be specified upon startup using the `-D` option
-prefix. For example, configuring the cluster name by using system properties
-works like this:
-
-```console
-# docker run -d crate/crate crate -Des.cluster.name=<my-cluster-name>
-```
 
 For further configuration options refer to the
 [Configuration](https://crate.io/docs/stable/configuration.html) section of our
