@@ -8,8 +8,8 @@ from __future__ import absolute_import
 import re
 import sys
 import time
+from psycopg2 import connect
 from pprint import pprint
-from crate.client import connect
 from unittest import TestCase
 
 
@@ -23,13 +23,13 @@ class DockerBaseTestCase(TestCase):
         self.name = 'crate'
         self.is_running = False
 
-    def connect(self, port=4200):
+    def connect(self, port=5432):
         crate_ip = '127.0.0.1'
         if self.cli.info()['OperatingSystem'].startswith(u'Boot2Docker'):
             import subprocess;
             crate_ip = subprocess.check_output(r'docker-machine ip',
                 stderr=None, shell=True).decode("utf-8").strip('\n')
-        return connect(['{0}:{1}'.format(crate_ip, str(port))])
+        return connect(host=crate_ip, port=port)
 
     def setUp(self):
         pass
@@ -120,10 +120,13 @@ class SimpleRunTest(DockerBaseTestCase):
 
 class JavaPropertiesTest(DockerBaseTestCase):
     """
-    docker run -p 4200:4200 crate crate -Des.cluster.name=foo -Des.node.name=bar
+    docker run -p 5432:5432 crate crate -Des.cluster.name=foo crate
+               -Des.node.name=bar -Des.psql.enabled=true -Des.psql.port=5432
     """
 
-    @docker(['crate', '-Des.cluster.name=foo', '-Des.node.name=bar'], ports={4200:4200}, env=[])
+    @docker(['crate', '-Des.cluster.name=foo', '-Des.node.name=bar',
+                      '-Des.psql.enabled=true', '-Des.psql.port=5432'],
+            ports={5432:5432}, env=[])
     def testRun(self):
         self.wait_for_cluster()
         cursor = self.connect().cursor()
@@ -139,10 +142,10 @@ class JavaPropertiesTest(DockerBaseTestCase):
 
 class EnvironmentVariablesTest(DockerBaseTestCase):
     """
-    docker run -p 4200:4200 --env CRATE_HEAP_SIZE=1048576000 crate crate
+    docker run -p 5432:5432 --env CRATE_HEAP_SIZE=1048576000 crate
     """
 
-    @docker(['crate'], ports={4200:4200}, env=['CRATE_HEAP_SIZE=1048576000'])
+    @docker(['crate'], ports={5432:5432}, env=['CRATE_HEAP_SIZE=1048576000'])
     def testRun(self):
         self.wait_for_cluster()
         # check -Xmx and -Xms process arguments
@@ -154,10 +157,11 @@ class EnvironmentVariablesTest(DockerBaseTestCase):
 
 class SigarStatsTest(DockerBaseTestCase):
     """
-    docker run -p 4200:4200 crate crate
+    docker run -p 5432:5432 crate -Des.psql.enabled=true -Des.psql.port=5432
     """
 
-    @docker(['crate'], ports={4200:4200}, env=[])
+    @docker(['crate', '-Des.psql.enabled=true', '-Des.psql.port=5432'],
+            ports={5432:5432}, env=[])
     def testRun(self):
         self.wait_for_cluster()
         cursor = self.connect().cursor()
