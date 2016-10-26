@@ -1,26 +1,11 @@
-*This is Crate.IO's own repository featuring the latest builds. The
+*This is Crate.io's own repository featuring the latest builds. The
 official images can be found [here](https://hub.docker.com/_/crate/)*
 
-# What Is Crate?
+# What Is CrateDB?
 
-Crate is an open source fast, scalable, easy to use SQL database that plays
-nicely with containers like Docker. It feels like the SQL databases you know,
-but makes scaling and operating your database ridiculously easy - regardless of
-the volume, complexity, or type of data. It ingests millions of records per
-second for time series setups and delivers analytics results in sub-second real
-time.
-
-Crate comes with a distributed sort and aggregation engine, fast multi index
-queries, native full-text search and super simple scalability with sharding and
-partitioning builtin. Preconfigured replication takes care of data resiliency.
-The cluster management can be supervised with a built-in admin UI. Crate's
-masterless architecture and simplicity make the data part of Docker environments
-easy and elegant.
-
-Crate provides several installation packages, including a supported Docker
-image. It fits perfectly into an orchestrated microservices environment. It acts
-like an omnipresent, persistent layer for data. Application
-containers access their data regardless of which host the data nodes run.
+CrateDB is an open source, distributed SQL database with integrated search that makes it simple to store and analyze massive amounts of structured and unstructured data in real-time. A shared-nothing architecture and automatic data sharding  & rebalancing make it easy to scale out a highly available CrateDB cluster to handle more data, more queries or more users.
+CrateDB is ideal for machine data. It's able to ingest millions of sensor readings or log entries per second and query them at in-memory speed using the same SQL syntax that already exists in your applications and BI tools. An advanced distributed query engine enables CrateDB to perform joins, sub-selects,, aggregations and even ad hoc queries at high speed.
+CrateDB provides several installation packages, including a supported Docker image. It fits perfectly into an orchestrated microservices environment, providing a scalable, containerized persistence layer that scales along with your app containers. CrateDB clusters can be supervised with an interactive database administration tool.
 
 [Crate](https://crate.io/)
 
@@ -35,7 +20,7 @@ The configuration includes the required minimum settings:
  - Port mapping to localhost (run only one container per machine)
  - Unicast host discovery
 
-To start the Crate cluster in containers distributed to three hosts without
+To start the CrateDB cluster in containers distributed to three hosts without
 multicast enabled, run this command on the first node and adapt the container
 and node names on the two other nodes:
 
@@ -61,46 +46,46 @@ and node names on the two other nodes:
 
 # The crate/crate Docker Image
 
-To form a cluster from scratch, start a few instances of the Crate container as a background
+To form a cluster from scratch, start a few instances of the CrateDB container as a background
 daemon:
 
 ```console
-# docker run -d crate/crate crate
+# docker run -d crate/crate
 ```
 
 To access the admin UI, map port 4200 and point your browser to port tcp/4200 of
 a node of your choice while you start it or look up its IP later:
 
 ```console
-# firefox "http://$(docker inspect --format='{{.NetworkSettings.IPAddress}}' $(docker run -d crate/crate crate)):4200/admin"
+# firefox "http://$(docker inspect --format='{{.NetworkSettings.IPAddress}}' $(docker run -d crate/crate)):4200/admin"
 ```
 
 For production use it's strongly recommended to use only one container per
-machine. This will give the best possible performance and by mapping
-the ports from the Docker container to the host it acts like a native
-installation. Crate's default ports 4200 (HTTP) and 4300 (Transport protocol).
+machine. This will give the best possible performance, and by mapping
+the ports from the Docker container to the host, it acts like a native
+installation. CrateDB's default ports 4200 (HTTP), 4300 (Transport protocol) and 5432 (Postgres wire protocol).
 
 ```console
-# docker run -d -p 4200:4200 -p 4300:4300 crate/crate crate
+# docker run -d -p 4200:4200 -p 4300:4300 -p 5432:5432 crate/crate
 ```
 
 ## Attach Persistent Data Directory
 
-Crate stores all important data in _/data_. It's advised to mount this
-directory to avoid writing within the docker image:
+CrateDB stores all important data in _/data_. It's advised to mount this
+directory to avoid writing within the Docker image:
 
 ```console
-# docker run -d -v <data-dir>:/data crate/crate crate
+# docker run -d -v <data-dir>:/data crate/crate
 ```
 
-## Use Custom Crate Configuration
+## Use Custom CrateDB Configuration
 
-Starting with 0.55.0, Crate does no longer support providing custom
-configuration files. However it is still possible to mount Crate's configuration
-into `/crate/config/crate.yml`.
+Starting with release 0.55.0, CrateDB no longer supports providing custom
+configuration files. However it is still possible to mount CrateDB's configuration
+into `/config/crate.yml`.
 
 ```console
-# docker run -d -v <custom/config/path>/crate.yml:/crate/config/crate.yml crate/crate crate
+# docker run -d -v <custom/config/path>/crate.yml:/config/crate.yml crate/crate
 ```
 
 
@@ -110,19 +95,19 @@ documentation.
 
 ## Environment
 
-Crate recognizes environment variables like `CRATE_HEAP_SIZE` that need to be
-set with the `--env` option before the actual Crate core starts. You may want to
+CrateDB recognizes environment variables like `CRATE_HEAP_SIZE` that need to be
+set with the `--env` option before the actual CrateDB core starts. You may want to
 [assign about half of your memory
 it](https://crate.io/docs/reference/en/latest/configuration.html#crate-heap-size)
-as a rule of thumb to Crate:
+to CrateDB as a rule of thumb:
 
 ```console
-# docker run -d --env CRATE_HEAP_SIZE=32g crate/crate crate
+# docker run -d --env CRATE_HEAP_SIZE=32g crate/crate
 ```
 
 ## Open Files
 
-Depending on the size of your installation, Crate can open a lot of files. You
+Depending on the size of your installation, CrateDB can open a lot of files. You
 can check the number of open files with `ulimit -n`, but it can depend on your
 host operating system. To increase the number, start containers with the option
 `--ulimit nofile=65535`. Furthermore it is recommended to set the `memlock` limit
@@ -131,7 +116,7 @@ very high number (Docker requires a 64 bit integer) `--ulimit memlock=9223372036
 
 ## Multicast
 
-By Default, Crate uses multicast for node discovery. This means nodes started in
+By Default, CrateDB uses multicast for node discovery. This means nodes started in
 the same multicast zone will discover each other automatically. Docker multicast
 support between containers on different hosts depends on an overlay network
 driver. If that does not support multicast, you have to [enable unicast in a
@@ -139,24 +124,24 @@ custom
 _crate.yml_](https://crate.io/docs/reference/best_practice/multi_node_setup.html)
 file.
 
-Crate publishes the hostname it runs on for discovery within the cluster. If the
+CrateDB publishes the hostname it runs on for discovery within the cluster. If the
 address of the docker container differs from the actual host the docker image is
 running on, this is the case if you do port mapping to the host via the `-p`
-option, you need to tell Crate to publish the address of the docker host
+option, you need to tell CrateDB to publish the address of the docker host
 instead:
 
 ```console
 # docker run -d -p 4200:4200 -p 4300:4300 \
-    crate/crate crate -Des.network.publish_host=host1.example.com
+    crate/crate -Des.network.publish_host=host1.example.com
 ```
 
 If you change the transport port from the default `4300` to something else, you
-need to pass the publish port to Crate by adding
+need to pass the publish port to CrateDB by adding
 `-Des.transport.publish_port=4321` to your command.
 
-## Crate Shell
+## CrateDB Shell
 
-The Crate Shell `crash` is bundled with the Docker image. Since the `crash`
+The CrateDB Shell `crash` is bundled with the Docker image. Since the `crash`
 executable is already in the `$PATH` environment variable, simply run:
 
 ```console
@@ -167,7 +152,7 @@ executable is already in the `$PATH` environment variable, simply run:
 
 Documentation for this image is stored in the [`crate/` directory](https://github.com/docker-library/docs/tree/master/crate) of the [`docker-library/docs` GitHub repo](https://github.com/docker-library/docs). Be sure to familiarize yourself with the [repository's `REAMDE.md` file](https://github.com/docker-library/docs/blob/master/README.md) before attempting a pull request.
 
-Visit [Crate on Docker](https://crate.io/docs/install/containers/docker/) and get further documentation about how to get started with Crate.
+Visit [CrateDB on Docker](https://crate.io/docs/install/containers/docker/) and get further documentation about how to get started with CrateDB.
 
 # Issues
 
@@ -176,14 +161,14 @@ contact us through a [GitHub issue](https://github.com/crate/docker-crate/issues
 
 
 If you have any questions or suggestions, we are happy to help! Feel
-free to join our [public Crate community on Slack](https://crate.io/docs/support/slackin/).
+free to join our [public CrateDB community on Slack](https://crate.io/docs/support/slackin/).
 
 For further information and official contact visit
 [https://crate.io](https://crate.io).
 
 # Contributing
 
-You are very welcome to contribute features or fixes! Before we can accept any pull requests to Crate Data we need you to agree to our [CLA](https://crate.io/community/contribute/). For further information please refer to [CONTRIBUTING.rst](https://github.com/crate/crate/blob/master/CONTRIBUTING.rst).
+You are very welcome to contribute features or fixes! Before we can accept any pull requests to CrateDB Data we need you to agree to our [CLA](https://crate.io/community/contribute/). For further information please refer to [CONTRIBUTING.rst](https://github.com/crate/crate/blob/master/CONTRIBUTING.rst).
 
 # License
 
