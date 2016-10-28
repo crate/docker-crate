@@ -2,18 +2,21 @@ version: "2"
 services:
   crate:
     image: jodok/cratedb
-    ulimits:
-      nproc:
-        hard: 65535
-        soft: 65535
-      memlock:
-        hard: -1
-        soft: -1
-      nofile:
-        hard: 65535
-        soft: 65535
-    cap_add:
-      - IPC_LOCK
-    mem_limit: 2g
     environment:
       CRATE_HEAP_SIZE: 1g
+    mem_limit: 2g
+    memswap_limit: 2g
+    ulimits:
+      nproc:
+        soft: 65536
+        hard: 65536
+      nofile:
+        soft: 65536
+        hard: 65536
+      memlock:
+        soft: -1
+        hard: -1
+    cap_add:
+      - IPC_LOCK
+    security_opt:
+      - "seccomp=unconfined"
