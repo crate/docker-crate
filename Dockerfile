@@ -6,13 +6,11 @@ RUN addgroup crate && adduser -G crate -D -H crate
 # su/sudo with proper signaling inside docker
 RUN apk add --no-cache su-exec
 
-# install jdk
-RUN apk add --no-cache --virtual openjdk8-jre-base
-
 # install crate
 ENV CRATE_VERSION 0.56.3
 RUN set -xe \
     && apk add --no-cache --virtual .crate-rundeps \
+        openjdk8-jre-base \
         sigar \
     && apk add --no-cache --virtual .build-deps \
         curl \
