@@ -6,11 +6,6 @@ if [ "${1:0:1}" = '-' ]; then
     set -- crate "$@"
 fi
 
-if [ "$1" = 'crate' -a "$(id -u)" = '0' ]; then
-    chown -R crate:crate /data
-    set -- gosu crate "$@"
-fi
-
 # allow the container to be started with `--user`
 if [ "$1" = 'crate' -a "$(id -u)" = '0' ]; then
     chown -R crate:crate /config /data
