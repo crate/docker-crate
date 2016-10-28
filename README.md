@@ -42,7 +42,7 @@ and node names on the two other nodes:
 ```console
 # HOSTS="crate1.example.com:4300,crate2.example.com:4300,crate3.example.com:4300"
 # HOST="crate1.example.com"
-# docker run -d -p 4200:4200 -p 4300:4300 \
+# docker run -d -p 4200:4200 -p 4300:4300 -p 5432:5432 \
     --name crate1-container \
     --volume /mnt/data:/data \
     --ulimit nofile=65535 \
@@ -53,6 +53,7 @@ and node names on the two other nodes:
           -Des.cluster.name=crate-cluster \
           -Des.node.name=crate1 \
           -Des.transport.publish_port=4300 \
+          -Des.psql.port=5432 \
           -Des.network.publish_host="$HOST" \
           -Des.multicast.enabled=false \
           -Des.discovery.zen.ping.unicast.hosts="$HOSTS" \
@@ -80,8 +81,12 @@ machine. This will give the best possible performance and by mapping
 the ports from the Docker container to the host it acts like a native
 installation. Crate's default ports 4200 (HTTP) and 4300 (Transport protocol).
 
+Starting with 0.57.0, Crate supports the Postgres wire protocol. If the port
+is not specified, it defaults to the first free port from the 5432-5532 range.
+The Crate Docker container expose the complete range of Postgres service ports.
+
 ```console
-# docker run -d -p 4200:4200 -p 4300:4300 crate/crate crate
+# docker run -d -p 4200:4200 -p 4300:4300 -p 5432:5432 crate/crate crate
 ```
 
 ## Attach Persistent Data Directory
@@ -151,7 +156,7 @@ instead:
 ```
 
 If you change the transport port from the default `4300` to something else, you
-need to pass the publish port to Crate by adding
+need to pass the published port to Crate by adding
 `-Des.transport.publish_port=4321` to your command.
 
 ## Crate Shell

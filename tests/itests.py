@@ -120,12 +120,10 @@ class SimpleRunTest(DockerBaseTestCase):
 
 class JavaPropertiesTest(DockerBaseTestCase):
     """
-    docker run -p 5432:5432 crate crate -Des.cluster.name=foo crate
-               -Des.node.name=bar -Des.psql.enabled=true -Des.psql.port=5432
+    docker run crate crate -Des.cluster.name=foo crate -Des.node.name=bar
     """
 
-    @docker(['crate', '-Des.cluster.name=foo', '-Des.node.name=bar',
-                      '-Des.psql.enabled=true', '-Des.psql.port=5432'],
+    @docker(['crate', '-Des.cluster.name=foo', '-Des.node.name=bar'],
             ports={5432:5432}, env=[])
     def testRun(self):
         self.wait_for_cluster()
@@ -142,7 +140,7 @@ class JavaPropertiesTest(DockerBaseTestCase):
 
 class EnvironmentVariablesTest(DockerBaseTestCase):
     """
-    docker run -p 5432:5432 --env CRATE_HEAP_SIZE=1048576000 crate
+    docker run --env CRATE_HEAP_SIZE=1048576000 crate
     """
 
     @docker(['crate'], ports={5432:5432}, env=['CRATE_HEAP_SIZE=1048576000'])
@@ -157,11 +155,10 @@ class EnvironmentVariablesTest(DockerBaseTestCase):
 
 class SigarStatsTest(DockerBaseTestCase):
     """
-    docker run -p 5432:5432 crate -Des.psql.enabled=true -Des.psql.port=5432
+    docker run crate
     """
 
-    @docker(['crate', '-Des.psql.enabled=true', '-Des.psql.port=5432'],
-            ports={5432:5432}, env=[])
+    @docker(['crate'], ports={5432:5432}, env=[])
     def testRun(self):
         self.wait_for_cluster()
         cursor = self.connect().cursor()

@@ -62,7 +62,8 @@ WORKDIR /data
 
 # http: 4200 tcp
 # transport: 4300 tcp
-EXPOSE 4200 4300
+# postgres protocol ports: 5432-5532 tcp
+EXPOSE 4200 4300 5432-5532
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["crate"]
