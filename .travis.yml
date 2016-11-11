@@ -2,17 +2,14 @@ language: python
 python:
     - 3.5
 
+dist: trusty
 sudo: required
-services:
-  - docker
 
 install:
     - python bootstrap.py
     - bin/buildout
 
 script:
-    - docker build -t boot2docker/boot2docker .
-    - docker run -d boot2docker/boot2docker > boot2docker.iso
     - bin/test
 
 notifications:
