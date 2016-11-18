@@ -20,7 +20,7 @@ from docker import Client
 from docker.utils import kwargs_from_env
 
 from itests import SimpleRunTest, JavaPropertiesTest, \
-    EnvironmentVariablesTest, SigarStatsTest
+    EnvironmentVariablesTest, SigarStatsTest, TarballRemovedTest
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +70,7 @@ def test_suite():
     suite.addTest(JavaPropertiesTest(docker_layer))
     suite.addTest(EnvironmentVariablesTest(docker_layer))
     suite.addTest(SigarStatsTest(docker_layer))
+    suite.addTest(TarballRemovedTest(docker_layer))
     suite.layer = docker_layer
     return suite
 

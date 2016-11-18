@@ -173,3 +173,15 @@ class SigarStatsTest(DockerBaseTestCase):
         for entry in result:
             for _, value in entry[0].items():
                 self.assertNotEqual(value, -1)
+
+class TarballRemovedTest(DockerBaseTestCase):
+    """
+    docker run crate /bin/sh -c 'ls -la /crate-*'
+    """
+
+    @docker(['crate'], ports={5432:5432}, env=[])
+    def testRun(self):
+        self.wait_for_cluster()
+        id = self.cli.exec_create('crate', 'ls -la /crate-*')
+        res = self.cli.exec_start(id['Id'])
+        self.assertEqual(b'ls: /crate-*: No such file or directory\n', res)

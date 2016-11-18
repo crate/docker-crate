@@ -45,6 +45,7 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && rm -r "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
+    && rm crate-$CRATE_VERSION.tar.gz \
     && ln -s /usr/bin/python3 /usr/bin/python \
     && rm /crate/plugins/sigar/lib/libsigar-amd64-linux.so \
     && chown -R crate /crate \
