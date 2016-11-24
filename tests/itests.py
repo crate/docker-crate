@@ -9,8 +9,11 @@ import re
 import sys
 import time
 from psycopg2 import connect
-from pprint import pprint
 from unittest import TestCase
+
+
+class InvalidState(Exception):
+    pass
 
 
 class DockerBaseTestCase(TestCase):
@@ -23,45 +26,38 @@ class DockerBaseTestCase(TestCase):
         self.name = 'crate'
         self.is_running = False
 
-    def connect(self, port=5432):
+    def connect(self, port=55432):
         crate_ip = '127.0.0.1'
         if self.cli.info()['OperatingSystem'].startswith(u'Boot2Docker'):
-            import subprocess;
+            import subprocess
             crate_ip = subprocess.check_output(r'docker-machine ip',
                 stderr=None, shell=True).decode("utf-8").strip('\n')
         return connect(host=crate_ip, port=port)
 
-    def setUp(self):
-        pass
-
-    def start(self, **docker_cmd):
-        try:
-            self._setUp(**docker_cmd)
-        except Exception as e:
-            # not a very good check
-            if hasattr(e, response):
-                regex = re.compile(r'[a-f0-9]{12}')
-                _id = regex.findall(e.response.text)
-                if _id and len(_id):
-                    self.stop(_id[0])
-
-    def _start(self, cmd='crate', ports={}, env=[]):
+    def start(self, cmd='crate', ports={}, env=[]):
+        if self.is_running:
+            raise InvalidState('Container is still running.')
+        host_conf = self.cli.create_host_config(port_bindings=ports)
         self.container = self.cli.create_container(
             image=self._layer.tag,
             command=cmd,
             ports=list(ports.keys()),
+            host_config=host_conf,
             environment=env,
             name=self.name
         )
-        self.cli.start(self.name, port_bindings=ports)
+        self.cli.start(container=self.container_id)
         process = self.crate_process()
-        sys.stdout.write('Waiting for Docker container ')
-        while not process.split()[0].endswith('java'):
+        sys.stdout.write('Waiting for Docker container ...')
+        while not process:
             sys.stdout.write('.')
             time.sleep(0.1)
             process = self.crate_process()
         print('')
         self.is_running = True
+
+    def setUp(self):
+        pass
 
     def tearDown(self):
         if self.container_id:
@@ -71,6 +67,7 @@ class DockerBaseTestCase(TestCase):
         self.cli.stop(_id)
         self.cli.remove_container(_id)
         self.container = None
+        time.sleep(1)
         self.is_running = False
 
     @property
@@ -83,7 +80,12 @@ class DockerBaseTestCase(TestCase):
 
     def crate_process(self):
         proc = self.info(u'Processes')
-        return proc and proc[0][2] or ''
+        if not proc:
+            return ''
+        for p in proc[0]:
+            if p.startswith('java'):
+                return p
+        return ''
 
     def logs(self):
         return self.cli.logs(self.name)
@@ -100,7 +102,7 @@ def docker(cmd, ports={}, env=[]):
     def wrap(fn):
         def inner_fn(self, *args, **kwargs):
             print(self.__class__.__doc__)
-            self._start(cmd=cmd, ports=ports, env=env)
+            self.start(cmd=cmd, ports=ports, env=env)
             fn(self)
         return inner_fn
     return wrap
@@ -118,24 +120,27 @@ class SimpleRunTest(DockerBaseTestCase):
         self.assertTrue('elected_as_master' in lg[-3:][0])
         self.assertTrue(lg[-2:][0].endswith('started'))
 
+
 class JavaPropertiesTest(DockerBaseTestCase):
     """
     docker run crate crate -Des.cluster.name=foo crate -Des.node.name=bar
     """
 
     @docker(['crate', '-Des.cluster.name=foo', '-Des.node.name=bar'],
-            ports={5432:5432}, env=[])
+            ports={5432:55432}, env=[])
     def testRun(self):
         self.wait_for_cluster()
-        cursor = self.connect().cursor()
-        # cluster name
-        cursor.execute('''select name from sys.cluster''')
-        res = cursor.fetchall()
-        self.assertEqual(res[0][0], 'foo')
-        # node name
-        cursor.execute('''select name from sys.nodes''')
-        res = cursor.fetchall()
-        self.assertEqual(res[0][0], 'bar')
+        conn = self.connect(port=55432)
+        with conn.cursor() as cursor:
+            # cluster name
+            cursor.execute('''select name from sys.cluster''')
+            res = cursor.fetchall()
+            self.assertEqual(res[0][0], 'foo')
+            # node name
+            cursor.execute('''select name from sys.nodes''')
+            res = cursor.fetchall()
+            self.assertEqual(res[0][0], 'bar')
+        conn.close()
 
 
 class EnvironmentVariablesTest(DockerBaseTestCase):
@@ -143,7 +148,7 @@ class EnvironmentVariablesTest(DockerBaseTestCase):
     docker run --env CRATE_HEAP_SIZE=1048576000 crate
     """
 
-    @docker(['crate'], ports={5432:5432}, env=['CRATE_HEAP_SIZE=1048576000'])
+    @docker(['crate'], ports={}, env=['CRATE_HEAP_SIZE=1048576000'])
     def testRun(self):
         self.wait_for_cluster()
         # check -Xmx and -Xms process arguments
@@ -158,16 +163,16 @@ class SigarStatsTest(DockerBaseTestCase):
     docker run crate
     """
 
-    @docker(['crate'], ports={5432:5432}, env=[])
+    @docker(['crate'], ports={5432:55432}, env=[])
     def testRun(self):
         self.wait_for_cluster()
-        cursor = self.connect().cursor()
-
-        cursor.execute("select load from sys.nodes limit 1")
-        self.assert_not_fallback_values(cursor.fetchall())
-
-        cursor.execute("select mem from sys.nodes limit 1")
-        self.assert_not_fallback_values(cursor.fetchall())
+        conn = self.connect(port=55432)
+        with conn.cursor() as cursor:
+            cursor.execute("select load from sys.nodes limit 1")
+            self.assert_not_fallback_values(cursor.fetchall())
+            cursor.execute("select mem from sys.nodes limit 1")
+            self.assert_not_fallback_values(cursor.fetchall())
+        conn.close()
 
     def assert_not_fallback_values(self, result):
         for entry in result:
@@ -179,7 +184,7 @@ class TarballRemovedTest(DockerBaseTestCase):
     docker run crate /bin/sh -c 'ls -la /crate-*'
     """
 
-    @docker(['crate'], ports={5432:5432}, env=[])
+    @docker(['crate'], ports={}, env=[])
     def testRun(self):
         self.wait_for_cluster()
         id = self.cli.exec_create('crate', 'ls -la /crate-*')

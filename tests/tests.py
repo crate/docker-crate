@@ -5,24 +5,15 @@ __docformat__ = "reStructuredText"
 
 import os
 import sys
-import json
-import time
-import signal
-import logging
 
-import doctest
 import unittest
-import zc.customdoctests
 
-from pprint import pprint
 from requests.exceptions import ConnectionError
 from docker import Client
 from docker.utils import kwargs_from_env
 
 from itests import SimpleRunTest, JavaPropertiesTest, \
     EnvironmentVariablesTest, SigarStatsTest, TarballRemovedTest
-
-logger = logging.getLogger(__name__)
 
 DIR = os.path.dirname(__file__)
 
@@ -48,13 +39,17 @@ class DockerLayer(object):
         if self.client.ping() == u'OK':
             self.start()
         else:
-            raise RuntimeError('Docker is not available.\nMake sure you have Docker installed before running tests.\nVisit https://docker.com for installation instructions.')
+            raise RuntimeError('Docker is not available.\n'
+                               'Make sure you have Docker installed before running tests.\n'
+                               'Visit https://docker.com for installation instructions.')
 
     def start(self):
+        sys.stdout.write('\nBuilding container {}\n'.format(self.tag))
         for line in self.client.build(
                 path=os.path.abspath(os.path.join(DIR, '..')),
                 tag=self.tag, rm=True, forcerm=True):
-            sys.stdout.write(line.decode('utf-8'))
+            sys.stdout.write('.')
+        sys.stdout.write('\n')
 
     def tearDown(self):
         self.stop()

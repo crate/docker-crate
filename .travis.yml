@@ -1,15 +1,23 @@
+sudo: required
+
 language: python
+
 python:
-    - 3.5
+  - 3.5
+
+services:
+  - docker
+
+before_install:
+  - docker pull alpine:3.4
+  - docker images
 
 install:
-    - python bootstrap.py
-    - ./bin/buildout
+  - python bootstrap.py
+  - bin/buildout
 
 script:
-    - ./bin/test
+  - bin/test
 
 notifications:
-    email: false
-
-sudo: false
+  email: false
