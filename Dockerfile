@@ -48,7 +48,6 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && rm crate-$CRATE_VERSION.tar.gz \
     && ln -s /usr/bin/python3 /usr/bin/python \
     && rm /crate/plugins/sigar/lib/libsigar-amd64-linux.so \
-    && chown -R crate /crate \
     && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
