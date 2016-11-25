@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/crate/docker-crate.svg?branch=master)](https://travis-ci.org/crate/docker-crate)
+
 *This is Crate.IO's own repository featuring the latest builds. The
 official images can be found [here](https://hub.docker.com/_/crate/)*
 
@@ -22,10 +24,9 @@ image. It fits perfectly into an orchestrated microservices environment. It acts
 like an omnipresent, persistent layer for data. Application
 containers access their data regardless of which host the data nodes run.
 
-[Crate](https://crate.io/)
-
-
 ![logo](https://raw.githubusercontent.com/docker-library/docs/2517900006ae5f4c03c1d43235930c59f4614394/crate/logo.png)
+
+**https://crate.io/**
 
 # Quick Start Example: Multihost Production Setup
 
