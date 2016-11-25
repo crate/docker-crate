@@ -50,14 +50,14 @@ and node names on the two other nodes:
     --env CRATE_HEAP_SIZE=8g \
         crate/crate:latest \
         crate \
-          -Des.cluster.name=crate-cluster \
-          -Des.node.name=crate1 \
-          -Des.transport.publish_port=4300 \
-          -Des.psql.port=5432 \
-          -Des.network.publish_host="$HOST" \
-          -Des.multicast.enabled=false \
-          -Des.discovery.zen.ping.unicast.hosts="$HOSTS" \
-          -Des.discovery.zen.minimum_master_nodes=2
+          -Ccluster.name=crate-cluster \
+          -Cnode.name=crate1 \
+          -Ctransport.publish_port=4300 \
+          -Cpsql.port=5432 \
+          -Cnetwork.publish_host="$HOST" \
+          -Cmulticast.enabled=false \
+          -Cdiscovery.zen.ping.unicast.hosts="$HOSTS" \
+          -Cdiscovery.zen.minimum_master_nodes=2
 ```
 
 # The crate/crate Docker Image
@@ -152,12 +152,12 @@ instead:
 
 ```console
 # docker run -d -p 4200:4200 -p 4300:4300 \
-    crate/crate crate -Des.network.publish_host=host1.example.com
+    crate/crate crate -Cnetwork.publish_host=host1.example.com
 ```
 
 If you change the transport port from the default `4300` to something else, you
 need to pass the published port to Crate by adding
-`-Des.transport.publish_port=4321` to your command.
+`-Ctransport.publish_port=4321` to your command.
 
 ## Crate Shell
 
