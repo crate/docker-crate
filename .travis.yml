@@ -2,14 +2,15 @@ language: python
 python:
     - 3.5
 
+dist: trusty
+sudo: required
+
 install:
     - python bootstrap.py
-    - ./bin/buildout
+    - bin/buildout
 
 script:
-    - ./bin/test
+    - bin/test
 
 notifications:
     email: false
-
-sudo: false
