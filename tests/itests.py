@@ -123,10 +123,10 @@ class SimpleRunTest(DockerBaseTestCase):
 
 class JavaPropertiesTest(DockerBaseTestCase):
     """
-    docker run crate crate -Des.cluster.name=foo crate -Des.node.name=bar
+    docker run crate crate -Ccluster.name=foo crate -Cnode.name=bar
     """
 
-    @docker(['crate', '-Des.cluster.name=foo', '-Des.node.name=bar'],
+    @docker(['crate', '-Ccluster.name=foo', '-Cnode.name=bar'],
             ports={5432:55432}, env=[])
     def testRun(self):
         self.wait_for_cluster()
