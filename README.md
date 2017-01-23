@@ -51,14 +51,14 @@ and node names on the two other nodes:
     --env CRATE_HEAP_SIZE=8g \
         crate/crate:latest \
         crate \
-          -Des.cluster.name=crate-cluster \
-          -Des.node.name=crate1 \
-          -Des.transport.publish_port=4300 \
-          -Des.psql.port=5432 \
-          -Des.network.publish_host="$HOST" \
-          -Des.multicast.enabled=false \
-          -Des.discovery.zen.ping.unicast.hosts="$HOSTS" \
-          -Des.discovery.zen.minimum_master_nodes=2
+          -Ccluster.name=crate-cluster \
+          -Cnode.name=crate1 \
+          -Ctransport.publish_port=4300 \
+          -Cpsql.port=5432 \
+          -Cnetwork.publish_host="$HOST" \
+          -Cmulticast.enabled=false \
+          -Cdiscovery.zen.ping.unicast.hosts="$HOSTS" \
+          -Cdiscovery.zen.minimum_master_nodes=2
 ```
 
 # The crate/crate Docker Image
