@@ -1,7 +1,8 @@
 # Crate Configuration
 
-# Data Paths
+# Paths
 path:
   logs: /data/log
   data: /data/data
-  blobs: /data/blobs
+blobs:
+  path: /data/blobs

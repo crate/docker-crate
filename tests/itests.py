@@ -8,6 +8,7 @@ from __future__ import absolute_import
 import re
 import sys
 import time
+
 from psycopg2 import connect
 from unittest import TestCase
 
@@ -34,10 +35,24 @@ class DockerBaseTestCase(TestCase):
                 stderr=None, shell=True).decode("utf-8").strip('\n')
         return connect(host=crate_ip, port=port)
 
-    def start(self, cmd='crate', ports={}, env=[]):
+    def start(self, cmd=['crate'], ports={}, env=[]):
         if self.is_running:
             raise InvalidState('Container is still running.')
-        host_conf = self.cli.create_host_config(port_bindings=ports)
+
+        ulimits = [dict(name='memlock', soft=-1, hard=-1)]
+        host_conf = self.cli.create_host_config(port_bindings=ports, ulimits=ulimits)
+
+        self.assertTrue(len(cmd) >= 1)
+        self.assertEquals(cmd[0], 'crate')
+
+        cmd[1:1] = [
+            '-Cbootstrap.memory_lock=true',
+            '-Cnetwork.host=_site_',
+        ]
+        env[0:0] = [
+            'CRATE_HEAP_SIZE=128m',
+        ]
+
         self.container = self.cli.create_container(
             image=self._layer.tag,
             command=cmd,
@@ -46,7 +61,7 @@ class DockerBaseTestCase(TestCase):
             environment=env,
             name=self.name
         )
-        self.cli.start(container=self.container_id)
+        self.cli.start(self.container_id)
         process = self.crate_process()
         sys.stdout.write('Waiting for Docker container ...')
         while not process:
@@ -117,7 +132,7 @@ class SimpleRunTest(DockerBaseTestCase):
     def testRun(self):
         self.wait_for_cluster()
         lg = self.logs().decode("utf-8").split('\n')
-        self.assertTrue('elected_as_master' in lg[-3:][0])
+        self.assertTrue('new_master' in lg[-3:][0])
         self.assertTrue(lg[-2:][0].endswith('started'))
 
 
@@ -145,17 +160,17 @@ class JavaPropertiesTest(DockerBaseTestCase):
 
 class EnvironmentVariablesTest(DockerBaseTestCase):
     """
-    docker run --env CRATE_HEAP_SIZE=1048576000 crate
+    docker run --env CRATE_HEAP_SIZE=256m crate
     """
 
-    @docker(['crate'], ports={}, env=['CRATE_HEAP_SIZE=1048576000'])
+    @docker(['crate'], ports={}, env=['CRATE_HEAP_SIZE=256m'])
     def testRun(self):
         self.wait_for_cluster()
         # check -Xmx and -Xms process arguments
         process = self.crate_process()
         res = re.findall(r'-Xm[\S]+', process)
-        self.assertEqual('1048576000', res[0][len('-Xmx'):])
-        self.assertEqual('1048576000', res[0][len('-Xms'):])
+        self.assertEqual('256m', res[0][len('-Xmx'):])
+        self.assertEqual('256m', res[0][len('-Xms'):])
 
 
 class SigarStatsTest(DockerBaseTestCase):
@@ -178,6 +193,7 @@ class SigarStatsTest(DockerBaseTestCase):
         for entry in result:
             for _, value in entry[0].items():
                 self.assertNotEqual(value, -1)
+
 
 class TarballRemovedTest(DockerBaseTestCase):
     """
