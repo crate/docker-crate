@@ -11,6 +11,8 @@ services:
 before_install:
   - docker pull alpine:3.4
   - docker images
+  - sudo sysctl -w vm.max_map_count=262144
+  - sudo service docker restart
 
 install:
   - python bootstrap.py
