@@ -41,6 +41,10 @@ and initialize the Docker environment using the Quickstart Terminal::
 
   >>> /bin/bash -c "/Applications/Docker/Docker\ Quickstart\ Terminal.app/Contents/Resources/Scripts/start.sh"
 
+For CrateDB >= 1.2 you would need to change the following setting in your docker machine::
+
+  >>> docker-machine ssh default "sudo sysctl -w vm.max_map_count=262144"
+
 The tests are run using the `zope.testrunner <https://pypi.python.org/pypi/zope.testrunner>`_.
 To run the tests::
 
