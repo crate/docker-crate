@@ -110,6 +110,8 @@ class DockerBaseTestCase(TestCase):
         for line in self.cli.logs(self.name, stream=True):
             l = line.decode("utf-8").strip('\n').strip()
             print(l)
+            if "error" in l.lower():
+                self.fail("Error in logs")
             if l.endswith('started'):
                 break
 
