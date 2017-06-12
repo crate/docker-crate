@@ -27,7 +27,7 @@ RUN set -x \
 RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
-ENV CRATE_VERSION 1.1.4
+ENV CRATE_VERSION 1.1.5
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         python3 \
@@ -47,7 +47,7 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && rm crate-$CRATE_VERSION.tar.gz \
     && ln -s /usr/bin/python3 /usr/bin/python \
-    && rm /crate/plugins/sigar/lib/libsigar-amd64-linux.so \
+    && rm /crate/plugins/crate-sigar/libsigar-amd64-linux.so \
     && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
@@ -55,7 +55,7 @@ ENV PATH /crate/bin:$PATH
 VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
-ADD config/logging.yml /crate/config/logging.yml
+ADD config/log4j2.properties /crate/config/log4j2.properties
 COPY docker-entrypoint.sh /
 
 WORKDIR /data
