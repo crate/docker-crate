@@ -10,6 +10,7 @@ RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
 ENV CRATE_VERSION 2.1.0
+ENV GPG_KEY 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         openssl \
@@ -23,7 +24,9 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEY" \
+    || gpg --keyserver keyserver.pgp.com --recv-keys "$GPG_KEY" \
+    || gpg --keyserver pgp.mit.edu --recv-keys "$GPG_KEY" \
     && gpg --batch --verify crate-$CRATE_VERSION.tar.gz.asc crate-$CRATE_VERSION.tar.gz \
     && rm -r "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
     && mkdir /crate \
