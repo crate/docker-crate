@@ -9,7 +9,7 @@ MAINTAINER Crate.io office@crate.io
 RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
-ENV CRATE_VERSION 2.1.0
+ENV CRATE_VERSION 2.0.5
 ENV GPG_KEY 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
@@ -31,7 +31,8 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && ln -s /usr/bin/python3 /usr/bin/python \
-    && rm /crate/lib/sigar/libsigar-amd64-linux.so \
+    && rm /crate/plugins/crate-sigar/libsigar-amd64-linux.so \
+    #&& rm /crate/lib/sigar/libsigar-amd64-linux.so \
     && rm crate-$CRATE_VERSION.tar.gz crate-$CRATE_VERSION.tar.gz.asc \
     && rm -r "$GNUPGHOME" \
     && apk del .build-deps
