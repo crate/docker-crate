@@ -28,12 +28,12 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     || gpg --keyserver keyserver.pgp.com --recv-keys "$GPG_KEY" \
     || gpg --keyserver pgp.mit.edu --recv-keys "$GPG_KEY" \
     && gpg --batch --verify crate-$CRATE_VERSION.tar.gz.asc crate-$CRATE_VERSION.tar.gz \
-    && rm -r "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
-    && rm crate-$CRATE_VERSION.tar.gz \
     && ln -s /usr/bin/python3 /usr/bin/python \
     && rm /crate/lib/sigar/libsigar-amd64-linux.so \
+    && rm crate-$CRATE_VERSION.tar.gz crate-$CRATE_VERSION.tar.gz.asc \
+    && rm -r "$GNUPGHOME" \
     && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
