@@ -65,5 +65,9 @@ WORKDIR /data
 # postgres protocol ports: 5432-5532 tcp
 EXPOSE 4200 4300 5432-5532
 
+STOPSIGNAL SIGUSR2
+
+HEALTHCHECK CMD curl --silent --fail --head http://localhost:4200/ || exit 1
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["crate"]
