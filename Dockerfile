@@ -9,7 +9,7 @@ MAINTAINER Crate.io office@crate.io
 RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
-ENV CRATE_VERSION 2.0.4
+ENV CRATE_VERSION 2.1.0
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         openssl \
