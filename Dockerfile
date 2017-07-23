@@ -49,7 +49,7 @@ WORKDIR /data
 
 EXPOSE 4200 4300 5432
 
-STOPSIGNAL SIGUSR2
+STOPSIGNAL USR2
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["crate"]
