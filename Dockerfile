@@ -27,7 +27,7 @@ RUN set -x \
 RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
-ENV CRATE_VERSION 2.1.4
+ENV CRATE_VERSION 2.1.5
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         python3 \
