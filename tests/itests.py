@@ -27,13 +27,13 @@ class DockerBaseTestCase(TestCase):
         self.name = 'crate'
         self.is_running = False
 
-    def connect(self, port=55432):
+    def connect(self, port=55432, user='crate'):
         crate_ip = '127.0.0.1'
         if self.cli.info()['OperatingSystem'].startswith(u'Boot2Docker'):
             import subprocess
             crate_ip = subprocess.check_output(r'docker-machine ip',
                 stderr=None, shell=True).decode("utf-8").strip('\n')
-        return connect(host=crate_ip, port=port)
+        return connect(host=crate_ip, port=port, user=user)
 
     def start(self, cmd=['crate'], ports={}, env=[]):
         if self.is_running:
