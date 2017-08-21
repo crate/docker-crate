@@ -1,10 +1,10 @@
-## -*- docker-image-name: "docker-crate" -*-
+mage-name: "docker-crate" -*-
 #
 # Crate Dockerfile
 # https://github.com/crate/docker-crate
 #
 
-FROM alpine:3.5
+FROM arm64v8/alpine:3.5
 MAINTAINER Crate.IO GmbH office@crate.io
 
 ENV GOSU_VERSION 1.9
