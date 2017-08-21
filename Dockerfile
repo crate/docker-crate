@@ -1,4 +1,4 @@
-mage-name: "docker-crate" -*-
+## -*- docker-image-name: "docker-crate" -*-
 #
 # Crate Dockerfile
 # https://github.com/crate/docker-crate
