@@ -51,6 +51,8 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
+# Default heap size for Docker, can be overwritten by args
+ENV CRATE_HEAP_SIZE 512M
 
 VOLUME ["/data"]
 
