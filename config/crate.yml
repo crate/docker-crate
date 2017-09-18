@@ -1,5 +1,7 @@
 # Crate Configuration
 
+network.host: _site_
+
 # Paths
 path:
   logs: /data/log
