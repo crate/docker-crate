@@ -6,11 +6,10 @@ __docformat__ = "reStructuredText"
 import os
 import sys
 
+import docker
 import unittest
 
 from requests.exceptions import ConnectionError
-from docker import Client
-from docker.utils import kwargs_from_env
 
 from itests import SimpleRunTest, JavaPropertiesTest, \
     EnvironmentVariablesTest, SigarStatsTest, TarballRemovedTest
@@ -26,17 +25,10 @@ class DockerLayer(object):
         self.__name__ = name
         self.__bases__ = tuple([])
         self.tag = tag
-        self.client = Client(base_url='unix://var/run/docker.sock')
-        try:
-            self.client.ping()
-        except ConnectionError as e:
-            # http://docker-py.readthedocs.org/en/latest/boot2docker/
-            kwargs = kwargs_from_env()
-            kwargs['tls'].assert_hostname = False
-            self.client = Client(**kwargs)
+        self.client = docker.APIClient(base_url='unix://var/run/docker.sock')
 
     def setUp(self):
-        if self.client.ping() == u'OK':
+        if self.client.ping():
             self.start()
         else:
             raise RuntimeError('Docker is not available.\n'
