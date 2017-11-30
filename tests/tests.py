@@ -12,7 +12,7 @@ import unittest
 from requests.exceptions import ConnectionError
 
 from itests import SimpleRunTest, JavaPropertiesTest, \
-    EnvironmentVariablesTest, SigarStatsTest, TarballRemovedTest
+    EnvironmentVariablesTest, OsStatsTest, TarballRemovedTest
 
 DIR = os.path.dirname(__file__)
 
@@ -56,7 +56,7 @@ def test_suite():
     suite.addTest(SimpleRunTest(docker_layer))
     suite.addTest(JavaPropertiesTest(docker_layer))
     suite.addTest(EnvironmentVariablesTest(docker_layer))
-    suite.addTest(SigarStatsTest(docker_layer))
+    suite.addTest(OsStatsTest(docker_layer))
     suite.addTest(TarballRemovedTest(docker_layer))
     suite.layer = docker_layer
     return suite

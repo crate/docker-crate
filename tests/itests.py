@@ -175,7 +175,7 @@ class EnvironmentVariablesTest(DockerBaseTestCase):
         self.assertEqual('256m', res[0][len('-Xms'):])
 
 
-class SigarStatsTest(DockerBaseTestCase):
+class OsStatsTest(DockerBaseTestCase):
     """
     docker run crate
     """
