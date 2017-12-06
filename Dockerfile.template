@@ -4,7 +4,7 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM alpine:3.5
+FROM alpine:3.7
 MAINTAINER Crate.IO GmbH office@crate.io
 
 ENV GOSU_VERSION 1.9
