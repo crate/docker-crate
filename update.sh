@@ -28,5 +28,4 @@ if [[ ! -f "$TEMPLATE" ]]; then
     exit 1
 fi
 
-exit 0
 sed "s/XXX/$VERSION/g" "$TEMPLATE" > Dockerfile
