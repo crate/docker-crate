@@ -1,6 +1,6 @@
 # Crate Configuration
 
-network.host: _site_
+network.host: _local_,_site_
 
 # Paths
 path:
