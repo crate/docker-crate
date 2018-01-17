@@ -27,11 +27,12 @@ RUN set -x \
 RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
-ENV CRATE_VERSION 2.3.0
+ENV CRATE_VERSION 2.2.6
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         python3 \
         openssl \
+        sigar \
     && apk add --no-cache --virtual .build-deps \
         curl \
         gnupg \
@@ -46,6 +47,7 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && rm crate-$CRATE_VERSION.tar.gz \
     && ln -s /usr/bin/python3 /usr/bin/python \
+    && rm /crate/lib/sigar/libsigar-amd64-linux.so \
     && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
