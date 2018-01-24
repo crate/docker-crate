@@ -208,3 +208,53 @@ class TarballRemovedTest(DockerBaseTestCase):
         id = self.cli.exec_create('crate', 'ls -la /crate-*')
         res = self.cli.exec_start(id['Id'])
         self.assertEqual(b'ls: /crate-*: No such file or directory\n', res)
+
+
+class HealthcheckTest(DockerBaseTestCase):
+    """
+    docker run crate crate
+    """
+
+    @docker(['crate'], ports={}, env=[])
+    def testRun(self):
+        self.wait_for_cluster()
+
+        id = self.cli.exec_create('crate', '/bin/sh -c "cat /etc/hosts"')
+        self.cli.exec_start(id['Id'])
+
+        id = self.cli.exec_create(
+            'crate', '/bin/sh -c "echo > /etc/resolv.conf"')
+        self.cli.exec_start(id['Id'])
+
+        id = self.cli.exec_create('crate', '/bin/sh -c "echo > /etc/hosts"')
+        self.cli.exec_start(id['Id'])
+
+        container_config = self.cli.inspect_container(self.container)['Config']
+        self.assertTrue('Healthcheck' in container_config)
+
+        health_config = container_config['Healthcheck']
+
+        if 'Interval' in health_config:
+            healthcheck_interval_seconds = health_config['Interval'] / 1000000000
+        else:
+            healthcheck_interval_seconds = 30  # default interval
+
+        if 'Retries' in health_config:
+            healthcheck_retries = health_config['Retries']
+        else:
+            healthcheck_retries = 3  # default number of retries
+
+        container_unhealthy = False
+        # attempt for more than the configured number of retries just in case
+        # the first couple of checks don't pick up the host changes
+        # (this can particularly happen for small intervals like 1s)
+        attempt = 2 * healthcheck_retries
+        while(attempt > 0):
+            time.sleep(healthcheck_interval_seconds)
+            container_state = self.cli.inspect_container(self.container)
+            if container_state['State']['Health']['Status'] == "unhealthy":
+                container_unhealthy = True
+                break
+            attempt -= 1
+
+        self.assertTrue(container_unhealthy)
