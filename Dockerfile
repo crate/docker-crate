@@ -34,7 +34,6 @@ RUN apk add --no-cache --virtual .crate-rundeps \
         openssl \
         curl \
     && apk add --no-cache --virtual .build-deps \
-        curl \
         gnupg \
         tar \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
@@ -57,7 +56,7 @@ ENV CRATE_HEAP_SIZE 512M
 # if we cannot get any response from the CrateDB (connection refused, timeout 
 # etc). If any response is received (regardless of http status code) we 
 # consider the node as running. 
-HEALTHCHECK CMD eval "curl $(hostname):4200"
+HEALTHCHECK CMD curl $(hostname):4200
 
 VOLUME ["/data"]
 
