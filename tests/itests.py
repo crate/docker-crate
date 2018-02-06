@@ -47,7 +47,6 @@ class DockerBaseTestCase(TestCase):
 
         cmd[1:1] = [
             '-Cbootstrap.memory_lock=true',
-            '-Cnetwork.host=_site_',
         ]
         env[0:0] = [
             'CRATE_HEAP_SIZE=128m',
@@ -99,6 +98,7 @@ class DockerBaseTestCase(TestCase):
             return ''
         for p in proc[0]:
             if p.startswith('java'):
+                print('>>> ', p)
                 return p
         return ''
 
@@ -106,7 +106,7 @@ class DockerBaseTestCase(TestCase):
         return self.cli.logs(self.name)
 
     def wait_for_cluster(self):
-        print('Waiting for Crate to start ...')
+        print('Waiting for CrateDB to start ...')
         for line in self.cli.logs(self.name, stream=True):
             l = line.decode("utf-8").strip('\n').strip()
             print(l)
@@ -160,7 +160,7 @@ class JavaPropertiesTest(DockerBaseTestCase):
         conn.close()
 
 
-class EnvironmentVariablesTest(DockerBaseTestCase):
+class CrateHeapSizeTest(DockerBaseTestCase):
     """
     docker run --env CRATE_HEAP_SIZE=256m crate
     """
@@ -175,7 +175,36 @@ class EnvironmentVariablesTest(DockerBaseTestCase):
         self.assertEqual('256m', res[0][len('-Xms'):])
 
 
-class SigarStatsTest(DockerBaseTestCase):
+class CrateJavaOptsTest(DockerBaseTestCase):
+    """
+    docker run --env CRATE_JAVA_OPTS="-Dcom.sun.management.jmxremote" crate
+    """
+
+    @docker(['crate'], ports={}, env=['CRATE_JAVA_OPTS=-Dcom.sun.management.jmxremote'])
+    def testRun(self):
+        self.wait_for_cluster()
+
+        # check -XX process arguments
+        process = self.crate_process()
+        res = re.findall(r'-XX:[\S]+', process)
+        opts = [r[4:] for r in res]  # strip -XX: prefix
+        # crate docker java options
+        self.assertTrue('+UnlockExperimentalVMOptions' in opts)
+        self.assertTrue('+UseCGroupMemoryLimitForHeap' in opts)
+        # default java options
+        self.assertTrue('+UseConcMarkSweepGC' in opts)
+        self.assertTrue('+DisableExplicitGC' in opts)
+
+        # check -D process arguments
+        res = re.findall(r'-D[\S]+', process)
+        opts = [r[2:] for r in res]  # strip -D prefix
+        # crate docker java options
+        self.assertTrue('es.cgroups.hierarchy.override=/' in opts)
+        # explicitly set java option
+        self.assertTrue('com.sun.management.jmxremote' in opts)
+
+
+class NodeStatsTest(DockerBaseTestCase):
     """
     docker run crate
     """

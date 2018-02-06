@@ -5,6 +5,7 @@ __docformat__ = "reStructuredText"
 
 import os
 import sys
+import json
 
 import docker
 import unittest
@@ -12,13 +13,33 @@ import unittest
 from requests.exceptions import ConnectionError
 
 from itests import SimpleRunTest, JavaPropertiesTest, \
-    EnvironmentVariablesTest, SigarStatsTest, TarballRemovedTest, \
+    CrateHeapSizeTest, CrateJavaOptsTest, NodeStatsTest, TarballRemovedTest, \
     HealthcheckTest
 
 DIR = os.path.dirname(__file__)
+DEBUG = os.environ.get('BUILD_DEBUG', 'false') == 'true'
+
+
+def _print_debug(line):
+    """Print full docker build output"""
+    stream = json.loads(line.decode('utf-8')).get('stream')
+    if stream:
+        sys.stdout.write('  ' + stream)
+        sys.stdout.flush()
+
+
+def _print_short(line):
+    """Print dot for each docker build step"""
+    sys.stdout.write('.')
+    sys.stdout.flush()
+
+
+print_line = _print_debug if DEBUG else _print_short
+
 
 class RuntimeError(Exception):
     pass
+
 
 class DockerLayer(object):
 
@@ -41,7 +62,7 @@ class DockerLayer(object):
         for line in self.client.build(
                 path=os.path.abspath(os.path.join(DIR, '..')),
                 tag=self.tag, rm=True, forcerm=True):
-            sys.stdout.write('.')
+            print_line(line)
         sys.stdout.write('\n')
 
     def tearDown(self):
@@ -56,8 +77,9 @@ def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(SimpleRunTest(docker_layer))
     suite.addTest(JavaPropertiesTest(docker_layer))
-    suite.addTest(EnvironmentVariablesTest(docker_layer))
-    suite.addTest(SigarStatsTest(docker_layer))
+    suite.addTest(CrateHeapSizeTest(docker_layer))
+    suite.addTest(CrateJavaOptsTest(docker_layer))
+    suite.addTest(NodeStatsTest(docker_layer))
     suite.addTest(TarballRemovedTest(docker_layer))
     suite.addTest(HealthcheckTest(docker_layer))
     suite.layer = docker_layer
