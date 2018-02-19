@@ -32,8 +32,8 @@ RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         python3 \
         openssl \
-    && apk add --no-cache --virtual .build-deps \
         curl \
+    && apk add --no-cache --virtual .build-deps \
         gnupg \
         tar \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
@@ -51,6 +51,12 @@ RUN apk add --no-cache --virtual .crate-rundeps \
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
 ENV CRATE_HEAP_SIZE 512M
+
+# This healthcheck indicates if a CrateDB node is up and running. It will fail
+# if we cannot get any response from the CrateDB (connection refused, timeout
+# etc). If any response is received (regardless of http status code) we
+# consider the node as running.
+HEALTHCHECK CMD eval "curl $(hostname):4200"
 
 VOLUME ["/data"]
 
