@@ -8,8 +8,7 @@ For stable and testing versions of the official Docker image, see the [official 
 
 ## Contributing
 
-This project is primarily maintained by [Crate.io](http://crate.io/), but we
-welcome community contributions!
+This project is primarily maintained by [Crate.io](http://crate.io/), but we welcome community contributions!
 
 See the [contribution docs](CONTRIBUTING.rst) for more information.
 
@@ -18,7 +17,6 @@ See the [contribution docs](CONTRIBUTING.rst) for more information.
 Looking for more help?
 
 - Visit [the main CrateDB repository](https://github.com/crate/crate)
-- Check [StackOverflow](https://stackoverflow.com/tags/crate) for common
-  problems
+- Check [StackOverflow](https://stackoverflow.com/tags/crate) for common problems
 - Chat with us on [Slack](https://crate.io/docs/support/slackin/)
 - Get [paid support](https://crate.io/pricing/)
