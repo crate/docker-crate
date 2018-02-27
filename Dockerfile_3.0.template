@@ -51,10 +51,6 @@ RUN apk add --no-cache --virtual .crate-rundeps \
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
 ENV CRATE_HEAP_SIZE 512M
-# GC logging set to default value of path.logs
-ENV CRATE_GC_LOG_DIR /data/log
-# Special VM options for Java in Docker
-ENV CRATE_JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Des.cgroups.hierarchy.override=/ $CRATE_JAVA_OPTS"
 
 # This healthcheck indicates if a CrateDB node is up and running. It will fail
 # if we cannot get any response from the CrateDB (connection refused, timeout
@@ -66,7 +62,7 @@ VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/log4j2.properties /crate/config/log4j2.properties
-COPY docker-entrypoint.sh /
+COPY entrypoint_3.0.sh /docker-entrypoint.sh
 
 WORKDIR /data
 

@@ -2,6 +2,8 @@
 
 set -ae
 
+# GC logging set to default value of path.logs
+CRATE_GC_LOG_DIR="/data/log"
 # Special VM options for Java in Docker
 CRATE_JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Des.cgroups.hierarchy.override=/ $CRATE_JAVA_OPTS"
 
