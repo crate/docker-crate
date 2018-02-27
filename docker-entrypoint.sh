@@ -2,8 +2,6 @@
 
 set -ae
 
-CRATE_JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Des.cgroups.hierarchy.override=/ $CRATE_JAVA_OPTS"
-
 if [ "${1:0:1}" = '-' ]; then
     set -- crate "$@"
 fi
