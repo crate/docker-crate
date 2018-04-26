@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 set -ae
 
 # Special VM options for Java in Docker
-CRATE_JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Des.cgroups.hierarchy.override=/ $CRATE_JAVA_OPTS"
+CRATE_JAVA_OPTS="-Des.cgroups.hierarchy.override=/ $CRATE_JAVA_OPTS"
 
 if [ "${1:0:1}" = '-' ]; then
     set -- crate "$@"

@@ -4,15 +4,17 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM alpine:3.7
+FROM openjdk:11-jre-slim
 MAINTAINER Crate.IO GmbH office@crate.io
 
+RUN set -x
+
+# install gosu
 ENV GOSU_VERSION 1.9
-RUN set -x \
-    && apk add --no-cache --virtual .gosu-deps \
-        dpkg \
-        gnupg \
-        curl \
+ENV CRATE_VERSION 2.3.6
+
+RUN apt update && apt install -y --no-install-recommends curl gnupg python3 openssl tar \
+    && echo "Installing gosu ${GOSU_VERSION} ..." \
     && export ARCH=$(echo $(dpkg --print-architecture) | cut -d"-" -f3) \
     && curl -o /usr/local/bin/gosu -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH" \
     && curl -o /usr/local/bin/gosu.asc -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH.asc" \
@@ -22,20 +24,7 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
-    && apk del .gosu-deps
-
-RUN addgroup crate && adduser -G crate -H crate -D
-
-# install crate
-ENV CRATE_VERSION 2.3.6
-RUN apk add --no-cache --virtual .crate-rundeps \
-        openjdk8-jre-base \
-        python3 \
-        openssl \
-        curl \
-    && apk add --no-cache --virtual .build-deps \
-        gnupg \
-        tar \
+    && echo "Installing CrateDB ${CRATE_VERSION} ..." \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -46,7 +35,11 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && rm crate-$CRATE_VERSION.tar.gz \
     && ln -s /usr/bin/python3 /usr/bin/python \
-    && apk del .build-deps
+    && rm -rf /var/lib/apt/lists/*
+
+# add crate user
+RUN addgroup --system --gid 1000 crate \
+    && adduser --system --no-create-home --gid 1000 --uid 1001 crate
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
