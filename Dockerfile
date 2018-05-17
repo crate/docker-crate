@@ -58,7 +58,9 @@ ENV CRATE_HEAP_SIZE 512M
 # consider the node as running.
 HEALTHCHECK CMD curl $(hostname):4200
 
-VOLUME ["/data"]
+RUN mkdir -p /data/data /data/log
+
+VOLUME /data
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/log4j2.properties /crate/config/log4j2.properties
