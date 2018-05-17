@@ -27,7 +27,7 @@ RUN set -x \
 RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
-ENV CRATE_VERSION 2.3.9
+ENV CRATE_VERSION 3.0.0
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         python3 \
@@ -62,7 +62,7 @@ VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/log4j2.properties /crate/config/log4j2.properties
-COPY docker-entrypoint.sh /
+COPY entrypoint_3.0.sh /docker-entrypoint.sh
 
 WORKDIR /data
 
