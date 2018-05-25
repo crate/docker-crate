@@ -27,7 +27,7 @@ RUN set -x \
 RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
-ENV CRATE_VERSION 3.0.0
+ENV CRATE_VERSION 2.3.10
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         python3 \
@@ -58,13 +58,11 @@ ENV CRATE_HEAP_SIZE 512M
 # consider the node as running.
 HEALTHCHECK CMD curl $(hostname):4200
 
-RUN mkdir -p /data/data /data/log
-
-VOLUME /data
+VOLUME ["/data"]
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/log4j2.properties /crate/config/log4j2.properties
-COPY entrypoint_3.0.sh /docker-entrypoint.sh
+COPY docker-entrypoint.sh /
 
 WORKDIR /data
 
