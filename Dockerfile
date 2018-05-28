@@ -56,7 +56,7 @@ ENV CRATE_HEAP_SIZE 512M
 # if we cannot get any response from the CrateDB (connection refused, timeout
 # etc). If any response is received (regardless of http status code) we
 # consider the node as running.
-HEALTHCHECK CMD curl $(hostname):4200
+HEALTHCHECK --timeout=30s --interval=30s CMD curl --fail --max-time 25 $(hostname):4200
 
 VOLUME ["/data"]
 
