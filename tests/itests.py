@@ -9,6 +9,9 @@ import re
 import sys
 import time
 
+from tempfile import mkdtemp
+from shutil import rmtree
+
 from psycopg2 import connect
 from unittest import TestCase
 
@@ -35,12 +38,16 @@ class DockerBaseTestCase(TestCase):
                 stderr=None, shell=True).decode("utf-8").strip('\n')
         return connect(host=crate_ip, port=port, user=user)
 
-    def start(self, cmd=['crate'], ports={}, env=[]):
+    def start(self, cmd=['crate'], ports={}, env=[], volumes={}):
         if self.is_running:
             raise InvalidState('Container is still running.')
 
         ulimits = [dict(name='memlock', soft=-1, hard=-1)]
-        host_conf = self.cli.create_host_config(port_bindings=ports, ulimits=ulimits)
+        host_conf = self.cli.create_host_config(
+            port_bindings=ports,
+            binds=volumes,
+            ulimits=ulimits,
+        )
 
         self.assertTrue(len(cmd) >= 1)
         self.assertEquals(cmd[0], 'crate')
@@ -58,6 +65,7 @@ class DockerBaseTestCase(TestCase):
             ports=list(ports.keys()),
             host_config=host_conf,
             environment=env,
+            volumes=['/data'],
             name=self.name
         )
         self.cli.start(self.container_id)
@@ -115,11 +123,11 @@ class DockerBaseTestCase(TestCase):
             if l.endswith('started'):
                 break
 
-def docker(cmd, ports={}, env=[]):
+def docker(cmd, ports={}, env=[], volumes={}):
     def wrap(fn):
         def inner_fn(self, *args, **kwargs):
             print(self.__class__.__doc__)
-            self.start(cmd=cmd, ports=ports, env=env)
+            self.start(cmd=cmd, ports=ports, env=env, volumes=volumes)
             fn(self)
         return inner_fn
     return wrap
@@ -202,6 +210,34 @@ class CrateJavaOptsTest(DockerBaseTestCase):
         self.assertTrue('es.cgroups.hierarchy.override=/' in opts)
         # explicitly set java option
         self.assertTrue('com.sun.management.jmxremote' in opts)
+
+
+class MountedDataDirectoryTest(DockerBaseTestCase):
+    """
+    docker run --volume $(mktemp -d):/data crate
+    """
+
+    VOLUMES = {
+        '/data': {
+            'bind': mkdtemp(),
+            'mode': 'rw',
+        }
+    }
+
+    @docker(['crate'],
+            ports={},
+            env=[],
+            volumes=VOLUMES)
+    def testRun(self):
+        self.wait_for_cluster()
+
+        id = self.cli.exec_create('crate', 'ls /data')
+        res = self.cli.exec_start(id['Id'])
+        self.assertEqual(b'blobs\ndata\nlog\n', res)
+
+    def tearDown(self):
+        rmtree(self.VOLUMES['/data']['bind'])
+        super().tearDown()
 
 
 class NodeStatsTest(DockerBaseTestCase):
