@@ -19,7 +19,7 @@ install:
   - bin/buildout
 
 script:
-  - bin/test
+  - bin/test -vvv
 
 notifications:
   email: false

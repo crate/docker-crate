@@ -12,29 +12,12 @@ import unittest
 
 from requests.exceptions import ConnectionError
 
+from utils import print_build_output
 from itests import SimpleRunTest, JavaPropertiesTest, \
     CrateHeapSizeTest, CrateJavaOptsTest, NodeStatsTest, TarballRemovedTest, \
     HealthcheckTest, MountedDataDirectoryTest
 
 DIR = os.path.dirname(__file__)
-DEBUG = os.environ.get('BUILD_DEBUG', 'false') == 'true'
-
-
-def _print_debug(line):
-    """Print full docker build output"""
-    stream = json.loads(line.decode('utf-8')).get('stream')
-    if stream:
-        sys.stdout.write('  ' + stream)
-        sys.stdout.flush()
-
-
-def _print_short(line):
-    """Print dot for each docker build step"""
-    sys.stdout.write('.')
-    sys.stdout.flush()
-
-
-print_line = _print_debug if DEBUG else _print_short
 
 
 class RuntimeError(Exception):
@@ -62,7 +45,7 @@ class DockerLayer(object):
         for line in self.client.build(
                 path=os.path.abspath(os.path.join(DIR, '..')),
                 tag=self.tag, rm=True, forcerm=True):
-            print_line(line)
+            print_build_output(line)
         sys.stdout.write('\n')
 
     def tearDown(self):

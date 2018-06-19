@@ -15,6 +15,8 @@ from shutil import rmtree
 from psycopg2 import connect
 from unittest import TestCase
 
+from utils import print_debug
+
 
 class InvalidState(Exception):
     pass
@@ -70,12 +72,10 @@ class DockerBaseTestCase(TestCase):
         )
         self.cli.start(self.container_id)
         process = self.crate_process()
-        sys.stdout.write('Waiting for Docker container ...')
+        print_debug('Waiting for Docker container ...')
         while not process:
-            sys.stdout.write('.')
             time.sleep(0.1)
             process = self.crate_process()
-        print('')
         self.is_running = True
 
     def setUp(self):
@@ -106,7 +106,7 @@ class DockerBaseTestCase(TestCase):
             return ''
         for p in proc[0]:
             if p.startswith('java'):
-                print('>>> ', p)
+                print_debug('>>>', p)
                 return p
         return ''
 
@@ -114,10 +114,10 @@ class DockerBaseTestCase(TestCase):
         return self.cli.logs(self.name)
 
     def wait_for_cluster(self):
-        print('Waiting for CrateDB to start ...')
+        print_debug('Waiting for CrateDB to start ...')
         for line in self.cli.logs(self.name, stream=True):
             l = line.decode("utf-8").strip('\n').strip()
-            print(l)
+            print_debug(l)
             if "[ERROR" in l:
                 self.fail("Error in logs")
             if l.endswith('started'):
