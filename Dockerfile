@@ -4,38 +4,31 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM alpine:3.7
+FROM ubuntu:16.04
 MAINTAINER Crate.IO GmbH office@crate.io
 
 ENV GOSU_VERSION 1.9
 RUN set -x \
-    && apk add --no-cache --virtual .gosu-deps \
-        dpkg \
-        gnupg \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
         curl \
-    && export ARCH=$(echo $(dpkg --print-architecture) | cut -d"-" -f3) \
-    && curl -o /usr/local/bin/gosu -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH" \
-    && curl -o /usr/local/bin/gosu.asc -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH.asc" \
+    && curl -o /usr/local/bin/gosu -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+    && curl -o /usr/local/bin/gosu.asc -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true \
-    && apk del .gosu-deps
+    && gosu nobody true
 
-RUN addgroup crate && adduser -G crate -H crate -D
+RUN groupadd -r crate && useradd -r -g crate crate
 
 # install crate
 ENV CRATE_VERSION 3.0.3
-RUN apk add --no-cache --virtual .crate-rundeps \
-        openjdk8-jre-base \
+RUN apt-get install -y --no-install-recommends \
         python3 \
-        openssl \
-        curl \
-    && apk add --no-cache --virtual .build-deps \
-        gnupg \
-        tar \
+        openjdk-8-jre \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -45,8 +38,7 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && rm crate-$CRATE_VERSION.tar.gz \
-    && ln -s /usr/bin/python3 /usr/bin/python \
-    && apk del .build-deps
+    && ln -s /usr/bin/python3 /usr/bin/python
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
