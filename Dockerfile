@@ -64,7 +64,7 @@ VOLUME /data
 
 ADD config/crate.yml /crate/config/crate.yml
 ADD config/log4j2.properties /crate/config/log4j2.properties
-COPY entrypoint_3.0.sh /docker-entrypoint.sh
+COPY docker-entrypoint.sh /
 
 WORKDIR /data
 
