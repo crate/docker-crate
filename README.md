@@ -1,10 +1,8 @@
 # CrateDB Docker Image
 
-Source repository for [CrateDB](http://github.com/crate/crate) Docker image.
+If you're reading this on [Docker Hub](https://hub.docker.com/r/crate/crate/), this image is a nightly build of the official Docker image.
 
-If you're viewing this on the Docker Hub, this image is a [nightly build](https://hub.docker.com/r/crate/crate/) of the official Docker image.
-
-For stable and testing versions of the official Docker image, see the [official image](https://hub.docker.com/_/crate/).
+For stable and testing versions of the official Docker image, use the [official image](https://hub.docker.com/_/crate/).
 
 ## Contributing
 
