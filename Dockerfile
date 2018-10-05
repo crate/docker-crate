@@ -48,6 +48,11 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && ln -s /usr/bin/python3 /usr/bin/python \
     && apk del .build-deps
 
+# install crash
+ENV CRASH_VERSION 0.24.1
+RUN curl -o /usr/local/bin/crash https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION \
+    && chmod +x /usr/local/bin/crash
+
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
 ENV CRATE_HEAP_SIZE 512M
