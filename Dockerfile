@@ -27,7 +27,7 @@ RUN set -x \
 RUN addgroup crate && adduser -G crate -H crate -D
 
 # install crate
-ENV CRATE_VERSION 3.1.1
+ENV CRATE_VERSION 3.1.2
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
         python3 \
@@ -49,7 +49,7 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && apk del .build-deps
 
 # install crash
-ENV CRASH_VERSION 0.24.1
+ENV CRASH_VERSION 0.24.2
 RUN curl -o /usr/local/bin/crash https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION \
     && chmod +x /usr/local/bin/crash
 
