@@ -45,13 +45,19 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && rm crate-$CRATE_VERSION.tar.gz \
-    && ln -s /usr/bin/python3 /usr/bin/python \
-    && apk del .build-deps
+    && ln -s /usr/bin/python3 /usr/bin/python
 
 # install crash
 ENV CRASH_VERSION 0.24.2
-RUN curl -o /usr/local/bin/crash https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION \
-    && chmod +x /usr/local/bin/crash
+RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION.asc \
+    && export GNUPGHOME="$(mktemp -d)" \
+    && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
+    && gpg --batch --verify crash_standalone_$CRASH_VERSION.asc crash_standalone_$CRASH_VERSION \
+    && rm -rf "$GNUPGHOME" crash_standalone_$CRASH_VERSION.asc \
+    && mv crash_standalone_$CRASH_VERSION /usr/local/bin/crash \
+    && chmod +x /usr/local/bin/crash \
+    && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
