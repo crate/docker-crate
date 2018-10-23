@@ -49,6 +49,13 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
+CRASH_VERSION_EXISTS=$(curl -fsSI https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION)
+
+if [ "$?" != "0" ]; then
+    echo "crash version $CRASH_VERSION doesn't exist!"
+    exit 1
+fi
+
 TAG_EXISTS=$(git tag | grep $TAG)
 
 if [ "$TAG" == "$TAG_EXISTS" ]; then
