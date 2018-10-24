@@ -45,11 +45,14 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
     && rm crate-$CRATE_VERSION.tar.gz \
-    && ln -s /usr/bin/python3 /usr/bin/python
+    && ln -s /usr/bin/python3 /usr/bin/python \
+    && apk del .build-deps
 
 # install crash
 ENV CRASH_VERSION 0.24.2
-RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION \
+RUN apk add --no-cache --virtual .build-deps \
+        gnupg \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
