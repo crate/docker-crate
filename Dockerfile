@@ -62,6 +62,12 @@ RUN apk add --no-cache --virtual .build-deps \
     && chmod +x /usr/local/bin/crash \
     && apk del .build-deps
 
+# by default java caches DNS lookups forever, which we don't want in a dynamic
+# environment. Negative DNS lookups are cached for 10s, which can lead to race
+# conditions when e.g. a docker stack services is being started
+RUN echo "networkaddress.cache.ttl=10" >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/policy/java.security
+RUN echo "networkaddress.cache.negative.ttl=5" >> /usr/lib/jvm/java-1.8-openjdk/jre/lib/security/policy/java.security
+
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
 ENV CRATE_HEAP_SIZE 512M
