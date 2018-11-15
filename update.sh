@@ -37,7 +37,7 @@ if [[ -z "${CRATE_VERSION}" || -z "${CRASH_VERSION}" || -z "${TEMPLATE}" ]]; the
     exit 1
 else
     TAG="${CRATE_VERSION}"
-    TEMPLATE="${TEMPLATE}.template"
+    TEMPLATE="${TEMPLATE}.j2"
     CRATE_VERSION=`echo ${TAG} | cut -d '-' -f 1`
 fi
 
@@ -68,4 +68,10 @@ if [[ ! -f "$TEMPLATE" ]]; then
     exit 1
 fi
 
-sed -e "s/XXX/$CRATE_VERSION/g" -e "s/YYY/$CRASH_VERSION/g"  "$TEMPLATE" > Dockerfile
+BUILD_TIMESTAMP=$(TZ=UTC date '+%FT%T.%N%:z')
+
+jinja2 \
+    -D CRATE_VERSION=$CRATE_VERSION \
+    -D CRASH_VERSION=$CRASH_VERSION \
+    -D BUILD_TIMESTAMP=$BUILD_TIMESTAMP \
+    Dockerfile.j2 > Dockerfile
