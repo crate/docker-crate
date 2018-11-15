@@ -4,29 +4,23 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM centos:7
-MAINTAINER Crate.IO GmbH office@crate.io
+# Prebuild Stage
+# Download, extract and verify CrateDB, Crash and Gosu artifacts.
+
+FROM centos:7 as prebuild
 
 ENV GOSU_VERSION 1.9
-RUN set -x \
-    && yum update -y \
-    && export ARCH=amd64 \
+RUN export ARCH=amd64 \
     && curl -o /usr/local/bin/gosu -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH" \
     && curl -o /usr/local/bin/gosu.asc -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true
+    && chmod +x /usr/local/bin/gosu
 
-RUN groupadd crate && adduser -g crate -M crate
-
-# install crate
 ENV CRATE_VERSION XXX
-RUN yum install -y centos-release-scl \
-    && yum install -y rh-python36 openssl java-1.8.0-openjdk \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
+RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
@@ -34,10 +28,8 @@ RUN yum install -y centos-release-scl \
     && rm -rf "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
     && mkdir /crate \
     && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
-    && rm crate-$CRATE_VERSION.tar.gz \
-    && ln -sf /usr/bin/python3 /usr/bin/python
+    && rm crate-$CRATE_VERSION.tar.gz
 
-# install crash
 ENV CRASH_VERSION YYY
 RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION.asc \
@@ -48,6 +40,22 @@ RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH
     && mv crash_standalone_$CRASH_VERSION /usr/local/bin/crash \
     && chmod +x /usr/local/bin/crash
 
+# Main Build Stage
+# Copy artifacts from prebuild stage, add entrypoint.
+
+FROM centos:7
+MAINTAINER Crate.IO GmbH office@crate.io
+
+COPY --from=prebuild /usr/local/bin/gosu /usr/local/bin/gosu
+COPY --from=prebuild /crate /crate
+COPY --from=prebuild /usr/local/bin/crash /usr/local/bin/crash
+
+RUN yum update -y \
+    && gosu nobody true \
+    && groupadd crate && adduser -g crate -M crate \
+    && yum install -y centos-release-scl java-1.8.0-openjdk \
+    && yum install -y rh-python36 \
+    && ln -sf /usr/bin/python3 /usr/bin/python
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
