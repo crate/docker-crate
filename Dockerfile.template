@@ -9,15 +9,9 @@
 
 FROM centos:7 as prebuild
 
-ENV GOSU_VERSION 1.9
-RUN export ARCH=amd64 \
-    && curl -o /usr/local/bin/gosu -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH" \
-    && curl -o /usr/local/bin/gosu.asc -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$ARCH.asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu
+RUN groupadd -g 1000 crate && adduser -u 1000 -g 1000 -d /crate crate
+WORKDIR /crate
+USER 1000
 
 ENV CRATE_VERSION XXX
 RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
@@ -26,9 +20,14 @@ RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.ta
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
     && gpg --batch --verify crate-$CRATE_VERSION.tar.gz.asc crate-$CRATE_VERSION.tar.gz \
     && rm -rf "$GNUPGHOME" crate-$CRATE_VERSION.tar.gz.asc \
-    && mkdir /crate \
-    && tar -xf crate-$CRATE_VERSION.tar.gz -C /crate --strip-components=1 \
+    && tar -xf crate-$CRATE_VERSION.tar.gz --strip-components=1 \
     && rm crate-$CRATE_VERSION.tar.gz
+
+COPY --chown=1000:0 config/crate.yml /config/crate.yml
+COPY --chown=1000:0 config/log4j2.properties config/log4j2.properties
+
+USER 0
+WORKDIR /usr/local/bin
 
 ENV CRASH_VERSION YYY
 RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH_VERSION \
@@ -37,8 +36,11 @@ RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
     && gpg --batch --verify crash_standalone_$CRASH_VERSION.asc crash_standalone_$CRASH_VERSION \
     && rm -rf "$GNUPGHOME" crash_standalone_$CRASH_VERSION.asc \
-    && mv crash_standalone_$CRASH_VERSION /usr/local/bin/crash \
-    && chmod +x /usr/local/bin/crash
+    && mv crash_standalone_$CRASH_VERSION crash \
+    && chmod +x crash
+
+RUN chown -R crate:0 . && chmod -R g=u /crate
+
 
 # Main Build Stage
 # Copy artifacts from prebuild stage, add entrypoint.
@@ -46,12 +48,10 @@ RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_$CRASH
 FROM centos:7
 MAINTAINER Crate.IO GmbH office@crate.io
 
-COPY --from=prebuild /usr/local/bin/gosu /usr/local/bin/gosu
-COPY --from=prebuild /crate /crate
+COPY --from=prebuild --chown=1000:0 /crate /crate
 COPY --from=prebuild /usr/local/bin/crash /usr/local/bin/crash
 
 RUN yum update -y \
-    && gosu nobody true \
     && groupadd crate && adduser -g crate -M crate \
     && yum install -y centos-release-scl java-1.8.0-openjdk \
     && yum install -y rh-python36 \
@@ -71,8 +71,7 @@ RUN mkdir -p /data/data /data/log
 
 VOLUME /data
 
-ADD config/crate.yml /crate/config/crate.yml
-ADD config/log4j2.properties /crate/config/log4j2.properties
+
 COPY docker-entrypoint.sh /
 
 WORKDIR /data

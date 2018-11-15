@@ -18,7 +18,7 @@ fi
 
 if [ "$1" = 'crate' -a "$(id -u)" = '0' ]; then
     chown -R crate:crate /data
-    set -- gosu crate "$@"
+    exec chroot --userspec=1000 / "$@"
 fi
 
 exec "$@"
