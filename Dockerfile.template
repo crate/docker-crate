@@ -7,29 +7,15 @@
 FROM ubuntu:16.04
 MAINTAINER Crate.IO GmbH office@crate.io
 
-ENV GOSU_VERSION 1.9
-RUN set -x \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        curl \
-    && curl -o /usr/local/bin/gosu -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-    && curl -o /usr/local/bin/gosu.asc -fSL "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true
-
-RUN groupadd -r crate && useradd -r -g crate crate
-
+RUN groupadd -g 1000 crate && useradd -u 1000 -g 1000 -d /crate crate
 
 # install crate
 ENV CRATE_VERSION XXX
-RUN apt-get install -y --no-install-recommends \
-        openjdk-8-jre \
-        python3 \
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+       openjdk-8-jre \
+       python3 \
+       curl \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-$CRATE_VERSION.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -66,8 +52,11 @@ RUN mkdir -p /data/data /data/log
 
 VOLUME /data
 
-ADD config/crate.yml /crate/config/crate.yml
-ADD config/log4j2.properties /crate/config/log4j2.properties
+COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
+COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
+
+RUN chown -R crate:0 /crate && chmod -R g=u /crate
+
 COPY docker-entrypoint.sh /
 
 WORKDIR /data
