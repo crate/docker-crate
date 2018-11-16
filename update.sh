@@ -63,9 +63,12 @@ if [ "$TAG" == "$TAG_EXISTS" ]; then
     exit 1
 fi
 
+
 if [[ ! -f "$TEMPLATE" ]]; then
     echo "Template $TEMPLATE does not exist"
     exit 1
 fi
 
-sed -e "s/XXX/$CRATE_VERSION/g" -e "s/YYY/$CRASH_VERSION/g"  "$TEMPLATE" > Dockerfile
+BUILD_TIMESTAMP=$(TZ=UTC date '+%FT%T.%N%:z')
+
+sed -e "s/XXX/$CRATE_VERSION/g" -e "s/YYY/$CRASH_VERSION/g" -e "s/AAA/$BUILD_TIMESTAMP/g" "$TEMPLATE" > Dockerfile
