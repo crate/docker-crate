@@ -7,6 +7,15 @@
 FROM centos:7
 MAINTAINER Crate.IO GmbH office@crate.io
 
+LABEL org.label-schema.schema-version="1.0" \
+    org.label-schema.build-date="AAA" \
+    org.label-schema.name="crate" \
+    org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
+    org.label-schema.url="https://crate.io/products/cratedb/" \
+    org.label-schema.vcs-url="https://github.com/crate/docker-crate" \
+    org.label-schema.vendor="Crate.io" \
+    org.label-schema.version="3.1.2"
+
 RUN groupadd -g 1000 crate && useradd -u 1000 -g 1000 -d /crate crate
 
 # install crate
