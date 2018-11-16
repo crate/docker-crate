@@ -105,7 +105,7 @@ class DockerBaseTestCase(TestCase):
         if not proc:
             return ''
         for p in proc[0]:
-            if p.startswith('java'):
+            if p.startswith('/bin/java'):
                 print_debug('>>>', p)
                 return p
         return ''
@@ -272,7 +272,7 @@ class TarballRemovedTest(DockerBaseTestCase):
         self.wait_for_cluster()
         id = self.cli.exec_create('crate', 'ls -la /crate-*')
         res = self.cli.exec_start(id['Id'])
-        self.assertEqual(b'ls: /crate-*: No such file or directory\n', res)
+        self.assertEqual(b'ls: cannot access /crate-*: No such file or directory\n', res)
 
 
 class HealthcheckTest(DockerBaseTestCase):
@@ -291,7 +291,7 @@ class HealthcheckTest(DockerBaseTestCase):
             'crate', '/bin/sh -c "echo > /etc/resolv.conf"')
         self.cli.exec_start(id['Id'])
 
-        id = self.cli.exec_create('crate', '/bin/sh -c "echo > /etc/hosts"')
+        id = self.cli.exec_create('crate', '/bin/sh -c "echo 127.0.0.2  $(hostname) > /etc/hosts"')
         self.cli.exec_start(id['Id'])
 
         container_config = self.cli.inspect_container(self.container)['Config']
