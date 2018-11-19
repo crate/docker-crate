@@ -17,14 +17,14 @@ RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
     && yum install -y python36u openssl java-1.8.0-openjdk \
     && yum clean all \
     && rm -rf /var/cache/yum \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.1.3.tar.gz \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.1.3.tar.gz.asc \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.0.7.tar.gz \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.0.7.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-3.1.3.tar.gz.asc crate-3.1.3.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-3.1.3.tar.gz.asc \
-    && tar -xf crate-3.1.3.tar.gz -C /crate --strip-components=1 \
-    && rm crate-3.1.3.tar.gz \
+    && gpg --batch --verify crate-3.0.7.tar.gz.asc crate-3.0.7.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-3.0.7.tar.gz.asc \
+    && tar -xf crate-3.0.7.tar.gz -C /crate --strip-components=1 \
+    && rm crate-3.0.7.tar.gz \
     && ln -sf /usr/bin/python3.6 /usr/bin/python3
 
 COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
@@ -62,13 +62,13 @@ WORKDIR /data
 EXPOSE 4200 4300 5432
 
 LABEL org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="2018-11-19T13:10:24.137233205+00:00" \
+    org.label-schema.build-date="2018-11-19T13:29:16.737728269+00:00" \
     org.label-schema.name="crate" \
     org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.label-schema.url="https://crate.io/products/cratedb/" \
     org.label-schema.vcs-url="https://github.com/crate/docker-crate" \
     org.label-schema.vendor="Crate.io" \
-    org.label-schema.version="3.1.3"
+    org.label-schema.version="3.0.7"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["crate"]
