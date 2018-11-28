@@ -5,7 +5,6 @@
 #
 
 FROM centos:7.5.1804
-MAINTAINER Crate.IO GmbH office@crate.io
 
 RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
 
@@ -61,7 +60,8 @@ WORKDIR /data
 # postgres protocol ports: 5432 tcp
 EXPOSE 4200 4300 5432
 
-LABEL org.label-schema.schema-version="1.0" \
+LABEL maintainer="Crate.io <office@crate.io>" \
+    org.label-schema.schema-version="1.0" \
     org.label-schema.build-date="2018-11-19T13:29:58.912957934+00:00" \
     org.label-schema.name="crate" \
     org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
