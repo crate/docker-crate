@@ -101,13 +101,15 @@ class DockerBaseTestCase(TestCase):
         return key and top.get(key) or top
 
     def crate_process(self):
-        proc = self.info(u'Processes')
-        if not proc:
+        procs = self.info(u'Processes')
+        if not procs:
             return ''
-        for p in proc[0]:
-            if p.startswith('/bin/java'):
-                print_debug('>>>', p)
-                return p
+
+        for proc in procs:
+            for p in proc:
+                if p.startswith('java'):
+                    print_debug('>>>', p)
+                    return p
         return ''
 
     def logs(self):
@@ -272,7 +274,7 @@ class TarballRemovedTest(DockerBaseTestCase):
         self.wait_for_cluster()
         id = self.cli.exec_create('crate', 'ls -la /crate-*')
         res = self.cli.exec_start(id['Id'])
-        self.assertEqual(b'ls: cannot access /crate-*: No such file or directory\n', res)
+        self.assertEqual(b"ls: cannot access '/crate-*': No such file or directory\n", res)
 
 
 class HealthcheckTest(DockerBaseTestCase):
@@ -291,7 +293,7 @@ class HealthcheckTest(DockerBaseTestCase):
             'crate', '/bin/sh -c "echo > /etc/resolv.conf"')
         self.cli.exec_start(id['Id'])
 
-        id = self.cli.exec_create('crate', '/bin/sh -c "echo 127.0.0.2  $(hostname) > /etc/hosts"')
+        id = self.cli.exec_create('crate', '/bin/sh -c "echo > /etc/hosts"')
         self.cli.exec_start(id['Id'])
 
         container_config = self.cli.inspect_container(self.container)['Config']

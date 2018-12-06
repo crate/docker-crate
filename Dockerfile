@@ -4,18 +4,23 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM centos:7.5.1804
+FROM alpine:3.8
 
-RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
+RUN addgroup -g 1000 -S crate \
+    && adduser -u 1000 -G crate -h /crate -S crate
 
 COPY docker-entrypoint.sh /
 
 # install crate
-RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
-    && yum makecache \
-    && yum install -y python36u openssl java-1.8.0-openjdk \
-    && yum clean all \
-    && rm -rf /var/cache/yum \
+RUN apk add --no-cache --virtual .crate-rundeps \
+        openjdk8-jre-base \
+        python3 \
+        openssl \
+        curl \
+        coreutils \
+    && apk add --no-cache --virtual .build-deps \
+        gnupg \
+        tar \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.1.2.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.1.2.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -24,20 +29,24 @@ RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
     && rm -rf "$GNUPGHOME" crate-3.1.2.tar.gz.asc \
     && tar -xf crate-3.1.2.tar.gz -C /crate --strip-components=1 \
     && rm crate-3.1.2.tar.gz \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python3
+    && ln -sf /usr/bin/python3 /usr/bin/python \
+    && apk del .build-deps
 
 COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 # install crash
-RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2\
+RUN apk add --no-cache --virtual .build-deps \
+        gnupg \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2\
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
     && gpg --batch --verify crash_standalone_0.24.2.asc crash_standalone_0.24.2 \
     && rm -rf "$GNUPGHOME" crash_standalone_0.24.2.asc \
     && mv crash_standalone_0.24.2 /usr/local/bin/crash \
-    && chmod +x /usr/local/bin/crash
+    && chmod +x /usr/local/bin/crash \
+    && apk del .build-deps
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
@@ -62,7 +71,7 @@ EXPOSE 4200 4300 5432
 
 LABEL maintainer="Crate.io <office@crate.io>" \
     org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="2018-11-19T13:29:58.912957934+00:00" \
+    org.label-schema.build-date="2018-12-06T11:00:20.455009437+00:00" \
     org.label-schema.name="crate" \
     org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.label-schema.url="https://crate.io/products/cratedb/" \
