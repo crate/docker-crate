@@ -21,14 +21,14 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && apk add --no-cache --virtual .build-deps \
         gnupg \
         tar \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.1.2.tar.gz \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.1.2.tar.gz.asc \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.1.3.tar.gz \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.1.3.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-3.1.2.tar.gz.asc crate-3.1.2.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-3.1.2.tar.gz.asc \
-    && tar -xf crate-3.1.2.tar.gz -C /crate --strip-components=1 \
-    && rm crate-3.1.2.tar.gz \
+    && gpg --batch --verify crate-3.1.3.tar.gz.asc crate-3.1.3.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-3.1.3.tar.gz.asc \
+    && tar -xf crate-3.1.3.tar.gz -C /crate --strip-components=1 \
+    && rm crate-3.1.3.tar.gz \
     && ln -sf /usr/bin/python3 /usr/bin/python \
     && apk del .build-deps
 
@@ -71,13 +71,13 @@ EXPOSE 4200 4300 5432
 
 LABEL maintainer="Crate.io <office@crate.io>" \
     org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="2018-12-06T11:00:20.455009437+00:00" \
+    org.label-schema.build-date="2018-12-06T23:39:49.888248104+00:00" \
     org.label-schema.name="crate" \
     org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.label-schema.url="https://crate.io/products/cratedb/" \
     org.label-schema.vcs-url="https://github.com/crate/docker-crate" \
     org.label-schema.vendor="Crate.io" \
-    org.label-schema.version="3.1.2"
+    org.label-schema.version="3.1.3"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["crate"]
