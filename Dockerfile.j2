@@ -9,8 +9,6 @@ FROM alpine:3.8
 RUN addgroup -g 1000 -S crate \
     && adduser -u 1000 -G crate -h /crate -S crate
 
-COPY docker-entrypoint.sh /
-
 # install crate
 RUN apk add --no-cache --virtual .crate-rundeps \
         openjdk8-jre-base \
@@ -31,9 +29,6 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && rm crate-{{ CRATE_VERSION }}.tar.gz \
     && ln -sf /usr/bin/python3 /usr/bin/python \
     && apk del .build-deps
-
-COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
-COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 # install crash
 RUN apk add --no-cache --virtual .build-deps \
@@ -78,6 +73,10 @@ LABEL maintainer="Crate.io <office@crate.io>" \
     org.label-schema.vcs-url="https://github.com/crate/docker-crate" \
     org.label-schema.vendor="Crate.io" \
     org.label-schema.version="{{ CRATE_VERSION }}"
+
+COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
+COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
+COPY docker-entrypoint.sh /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["crate"]
