@@ -74,4 +74,4 @@ jinja2 \
     -D CRATE_VERSION=$CRATE_VERSION \
     -D CRASH_VERSION=$CRASH_VERSION \
     -D BUILD_TIMESTAMP=$BUILD_TIMESTAMP \
-    Dockerfile.j2 > Dockerfile
+    $TEMPLATE > Dockerfile
