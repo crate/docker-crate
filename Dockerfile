@@ -4,21 +4,16 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM alpine:3.8
+FROM centos:7
 
-RUN addgroup -g 1000 -S crate \
-    && adduser -u 1000 -G crate -h /crate -S crate
+RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
 
 # install crate
-RUN apk add --no-cache --virtual .crate-rundeps \
-        openjdk8-jre-base \
-        python3 \
-        openssl \
-        curl \
-        coreutils \
-    && apk add --no-cache --virtual .build-deps \
-        gnupg \
-        tar \
+RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
+    && yum makecache \
+    && yum install -y python36u openssl java-1.8.0-openjdk \
+    && yum clean all \
+    && rm -rf /var/cache/yum \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.2.0.tar.gz \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.2.0.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -27,21 +22,20 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && rm -rf "$GNUPGHOME" crate-3.2.0.tar.gz.asc \
     && tar -xf crate-3.2.0.tar.gz -C /crate --strip-components=1 \
     && rm crate-3.2.0.tar.gz \
-    && ln -sf /usr/bin/python3 /usr/bin/python \
-    && apk del .build-deps
+    && ln -sf /usr/bin/python3 /usr/bin/python
+
+COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
+COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 # install crash
-RUN apk add --no-cache --virtual .build-deps \
-        gnupg \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2\
+RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2\
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
     && gpg --batch --verify crash_standalone_0.24.2.asc crash_standalone_0.24.2 \
     && rm -rf "$GNUPGHOME" crash_standalone_0.24.2.asc \
     && mv crash_standalone_0.24.2 /usr/local/bin/crash \
-    && chmod +x /usr/local/bin/crash \
-    && apk del .build-deps
+    && chmod +x /usr/local/bin/crash
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
