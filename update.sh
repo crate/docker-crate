@@ -5,6 +5,8 @@ function usage() {
     echo "./update.sh"
     echo -e "\t--crate-version CRATE_VERSION"
     echo -e "\t--crash-version CRASH_VERSION"
+    echo -e "\t--jdk-version JDK_VERSION"
+    echo -e "\t--jdk-url JDK_URL"
     echo -e "\t--template TEMPLATE"
     echo ""
 }
@@ -17,6 +19,14 @@ while [[ $# -gt 1 ]]; do
         ;;
     --crash-version)
         CRASH_VERSION="${2}"
+        shift
+        ;;
+    --jdk-version)
+        JDK_VERSION="${2}"
+        shift
+        ;;
+    --jdk-url)
+        JDK_URL="${2}"
         shift
         ;;
     --template)
@@ -39,8 +49,17 @@ else
     TAG="${CRATE_VERSION}"
     TEMPLATE="${TEMPLATE}.j2"
     CRATE_VERSION=`echo ${TAG} | cut -d '-' -f 1`
+    if [[ -z "${JDK_VERSION}" ]]; then
+        JDK_VERSION=11.0.1
+    else
+        JDK_VERSION=${JDK_VERSION}
+    fi
+    if [[ -z "${JDK_URL}" ]]; then
+        JDK_URL="https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz"
+    else
+        JDK_URL=${JDK_URL}
+    fi
 fi
-
 
 VERSION_EXISTS=$(curl -fsSI https://cdn.crate.io/downloads/releases/crate-${CRATE_VERSION}.tar.gz)
 
@@ -74,4 +93,6 @@ jinja2 \
     -D CRATE_VERSION=$CRATE_VERSION \
     -D CRASH_VERSION=$CRASH_VERSION \
     -D BUILD_TIMESTAMP=$BUILD_TIMESTAMP \
+    -D JDK_VERSION=$JDK_VERSION \
+    -D JDK_URL=$JDK_URL \
     $TEMPLATE > Dockerfile

@@ -107,7 +107,7 @@ class DockerBaseTestCase(TestCase):
 
         for proc in procs:
             for p in proc:
-                if p.startswith('java'):
+                if p.startswith('/opt/jdk'):
                     print_debug('>>>', p)
                     return p
         return ''
@@ -200,7 +200,6 @@ class CrateJavaOptsTest(DockerBaseTestCase):
         opts = [r[4:] for r in res]  # strip -XX: prefix
         # crate docker java options
         self.assertTrue('+UnlockExperimentalVMOptions' in opts)
-        self.assertTrue('+UseCGroupMemoryLimitForHeap' in opts)
         # default java options
         self.assertTrue('+UseConcMarkSweepGC' in opts)
         self.assertTrue('+DisableExplicitGC' in opts)
@@ -274,7 +273,7 @@ class TarballRemovedTest(DockerBaseTestCase):
         self.wait_for_cluster()
         id = self.cli.exec_create('crate', 'ls -la /crate-*')
         res = self.cli.exec_start(id['Id'])
-        self.assertEqual(b"ls: cannot access '/crate-*': No such file or directory\n", res)
+        self.assertEqual(b'ls: cannot access /crate-*: No such file or directory\n', res)
 
 
 class HealthcheckTest(DockerBaseTestCase):
@@ -293,7 +292,7 @@ class HealthcheckTest(DockerBaseTestCase):
             'crate', '/bin/sh -c "echo > /etc/resolv.conf"')
         self.cli.exec_start(id['Id'])
 
-        id = self.cli.exec_create('crate', '/bin/sh -c "echo > /etc/hosts"')
+        id = self.cli.exec_create('crate', '/bin/sh -c "echo 127.0.0.2  $(hostname) > /etc/hosts"')
         self.cli.exec_start(id['Id'])
 
         container_config = self.cli.inspect_container(self.container)['Config']

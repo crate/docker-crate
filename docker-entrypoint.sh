@@ -10,7 +10,7 @@ CRATE_HEAP_DUMP_PATH="/data/data"
 mkdir -pv $CRATE_GC_LOG_DIR $CRATE_HEAP_DUMP_PATH
 
 # Special VM options for Java in Docker
-CRATE_JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Des.cgroups.hierarchy.override=/ $CRATE_JAVA_OPTS"
+CRATE_JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -Des.cgroups.hierarchy.override=/ $CRATE_JAVA_OPTS"
 
 if [ "${1:0:1}" = '-' ]; then
     set -- crate "$@"

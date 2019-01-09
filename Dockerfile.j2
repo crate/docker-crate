@@ -8,10 +8,17 @@ FROM centos:7
 
 RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
 
+RUN curl --retry 8 -s {{ JDK_URL }} | tar -C /opt -zxf -
+
+ENV JAVA_HOME /opt/jdk-{{ JDK_VERSION }}
+
+# REF: https://github.com/elastic/elasticsearch-docker/issues/171
+RUN ln -sf /etc/pki/ca-trust/extracted/java/cacerts /opt/jdk-{{ JDK_VERSION }}/lib/security/cacerts
+
 # install crate
 RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
     && yum makecache \
-    && yum install -y python36u openssl java-1.8.0-openjdk \
+    && yum install -y python36u openssl \
     && yum clean all \
     && rm -rf /var/cache/yum \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-{{ CRATE_VERSION }}.tar.gz \
