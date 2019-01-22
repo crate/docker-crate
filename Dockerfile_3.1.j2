@@ -76,7 +76,7 @@ LABEL maintainer="Crate.io <office@crate.io>" \
 
 COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
-COPY docker-entrypoint.sh /
+COPY docker-entrypoint_3.1.sh /docker-entrypoint.sh
 
-ENTRYPOINT ["/docker-entrypoint_3.1.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["crate"]
