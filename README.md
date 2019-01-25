@@ -15,6 +15,5 @@ See the [contribution docs](CONTRIBUTING.rst) for more information.
 Looking for more help?
 
 - Visit [the main CrateDB repository](https://github.com/crate/crate)
-- Check [StackOverflow](https://stackoverflow.com/tags/crate) for common problems
-- Chat with us on [Slack](https://crate.io/docs/support/slackin/)
+- Chat with us via our [support channel](https://crate.io/support/)
 - Get [paid support](https://crate.io/pricing/)
