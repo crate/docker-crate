@@ -61,6 +61,8 @@ else
     fi
 fi
 
+JDK_SHA256=$(curl $JDK_URL.sha256)
+
 VERSION_EXISTS=$(curl -fsSI https://cdn.crate.io/downloads/releases/crate-${CRATE_VERSION}.tar.gz)
 
 if [ "$?" != "0" ]; then
@@ -95,4 +97,5 @@ jinja2 \
     -D BUILD_TIMESTAMP=$BUILD_TIMESTAMP \
     -D JDK_VERSION=$JDK_VERSION \
     -D JDK_URL=$JDK_URL \
+    -D JDK_SHA256=$JDK_SHA256 \
     $TEMPLATE > Dockerfile
