@@ -33,13 +33,13 @@ RUN apk add --no-cache --virtual .crate-rundeps \
 # install crash
 RUN apk add --no-cache --virtual .build-deps \
         gnupg \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.21.5\
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.21.5.asc \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2\
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crash_standalone_0.21.5.asc crash_standalone_0.21.5 \
-    && rm -rf "$GNUPGHOME" crash_standalone_0.21.5.asc \
-    && mv crash_standalone_0.21.5 /usr/local/bin/crash \
+    && gpg --batch --verify crash_standalone_0.24.2.asc crash_standalone_0.24.2 \
+    && rm -rf "$GNUPGHOME" crash_standalone_0.24.2.asc \
+    && mv crash_standalone_0.24.2 /usr/local/bin/crash \
     && chmod +x /usr/local/bin/crash \
     && apk del .build-deps
 
@@ -66,7 +66,7 @@ EXPOSE 4200 4300 5432
 
 LABEL maintainer="Crate.io <office@crate.io>" \
     org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="2019-02-05T14:52:32.724581774+00:00" \
+    org.label-schema.build-date="2019-02-07T11:22:48.301309289+00:00" \
     org.label-schema.name="crate" \
     org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.label-schema.url="https://crate.io/products/cratedb/" \
