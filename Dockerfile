@@ -32,7 +32,7 @@ RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
     && rm -rf "$GNUPGHOME" crate-3.2.3.tar.gz.asc \
     && tar -xf crate-3.2.3.tar.gz -C /crate --strip-components=1 \
     && rm crate-3.2.3.tar.gz \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python3
+    && ln -sf /usr/bin/python3.6 /usr/bin/python3 \
     && ln -sf /usr/bin/python3.6 /usr/bin/python
 
 COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
