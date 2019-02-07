@@ -71,7 +71,7 @@ EXPOSE 4200 4300 5432
 
 LABEL maintainer="Crate.io <office@crate.io>" \
     org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="2019-02-07T16:12:18.843010831+00:00" \
+    org.label-schema.build-date="2019-02-07T18:57:24.937639748+00:00" \
     org.label-schema.name="crate" \
     org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.label-schema.url="https://crate.io/products/cratedb/" \
