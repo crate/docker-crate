@@ -52,12 +52,6 @@ ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
 ENV CRATE_HEAP_SIZE 512M
 
-# This healthcheck indicates if a CrateDB node is up and running. It will fail
-# if we cannot get any response from the CrateDB (connection refused, timeout
-# etc). If any response is received (regardless of http status code) we
-# consider the node as running.
-HEALTHCHECK --timeout=30s --interval=30s CMD curl --max-time 25 $(hostname):4200 || exit 1
-
 RUN mkdir -p /data/data /data/log
 
 VOLUME /data

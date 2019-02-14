@@ -15,7 +15,7 @@ from requests.exceptions import ConnectionError
 from utils import print_build_output
 from itests import SimpleRunTest, JavaPropertiesTest, \
     CrateHeapSizeTest, CrateJavaOptsTest, NodeStatsTest, TarballRemovedTest, \
-    HealthcheckTest, MountedDataDirectoryTest
+    MountedDataDirectoryTest
 
 DIR = os.path.dirname(__file__)
 
@@ -64,7 +64,6 @@ def test_suite():
     suite.addTest(CrateJavaOptsTest(docker_layer))
     suite.addTest(NodeStatsTest(docker_layer))
     suite.addTest(TarballRemovedTest(docker_layer))
-    suite.addTest(HealthcheckTest(docker_layer))
     suite.addTest(MountedDataDirectoryTest(docker_layer))
     suite.layer = docker_layer
     return suite
