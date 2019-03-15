@@ -58,6 +58,12 @@ WORKDIR /data
 # postgres protocol ports: 5432 tcp
 EXPOSE 4200 4300 5432
 
+# These COPY commands have been moved before the last one due to the following issues:
+# https://github.com/moby/moby/issues/37965#issuecomment-448926448
+# https://github.com/moby/moby/issues/38866
+COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
+COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
+
 LABEL maintainer="Crate.io <office@crate.io>" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.build-date="{{ BUILD_TIMESTAMP }}" \
@@ -68,8 +74,6 @@ LABEL maintainer="Crate.io <office@crate.io>" \
     org.label-schema.vendor="Crate.io" \
     org.label-schema.version="{{ CRATE_VERSION }}"
 
-COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
-COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 COPY docker-entrypoint_3.1.sh /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
