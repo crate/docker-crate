@@ -22,7 +22,7 @@ class Version(NamedTuple):
 
     @classmethod
     def parse(cls, s: str):
-        return Version(*map(int, s.split('.', maxsplit=2)))
+        return Version(*map(int, s.split('.', maxsplit=2))) if s else None
 
     def __str__(self) -> str:
         return f'{self.major}.{self.minor}.{self.hotfix}'
