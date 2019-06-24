@@ -73,18 +73,21 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cratedb-version', type=Version.parse, required=True)
     parser.add_argument('--crash-version', type=Version.parse)
-    parser.add_argument('--jdk-version', type=Version.parse, default=Version(11, 0, 1))
+    parser.add_argument('--jdk-version', type=Version.parse)
     parser.add_argument('--template', type=str, default='Dockerfile.j2')
     args = parser.parse_args()
 
-    jdk_url, jdk_sha256 = jdk_url_and_sha(args.jdk_version)
+    cratedb_version = ensure_existing_cratedb(args.cratedb_version)
+    jdk_version_default = Version(12, 0, 1) if cratedb_version.major >= 4 else Version(11, 0, 1)
+    jdk_version = args.jdk_version or jdk_version_default
+    jdk_url, jdk_sha256 = jdk_url_and_sha(jdk_version)
 
     env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
     template = env.get_template(args.template)
     print(template.render(
         CRATE_VERSION=ensure_existing_cratedb(args.cratedb_version),
         CRASH_VERSION=ensure_existing_crash(args.crash_version),
-        JDK_VERSION=str(args.jdk_version),
+        JDK_VERSION=str(jdk_version),
         JDK_URL=jdk_url,
         JDK_SHA256=jdk_sha256,
         BUILD_TIMESTAMP=datetime.utcnow().isoformat()
