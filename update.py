@@ -3,12 +3,14 @@
 import argparse
 import json
 import os
+import re
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
-from typing import NamedTuple
+from typing import NamedTuple, Optional, Tuple
 from urllib.error import URLError
 from urllib.request import urlopen, Request
 
+RELEASE_URL = 'https://cdn.crate.io/downloads/releases/'
 JDK_URLS = {
     (12, 0, 1): 'https://download.java.net/java/GA/jdk12.0.1/69cfe15208a647278a19ef0990eea691/12/GPL/openjdk-12.0.1_linux-x64_bin.tar.gz',
     (11, 0, 1): 'https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz'
@@ -51,22 +53,30 @@ def url_exists(url: str) -> bool:
         return False
 
 
-def ensure_existing_crash(crash_version: Version) -> Version:
+def ensure_existing_crash_release(crash_version: Version) -> Tuple[Version, str]:
     if not crash_version:
-        return latest_crash()
-    url = f'https://cdn.crate.io/downloads/releases/crash_standalone_{crash_version}'
+        crash_version = latest_crash()
+    url = RELEASE_URL + f'crash_standalone_{crash_version}'
     if url_exists(url):
-        return crash_version
+        return crash_version, url
     else:
         raise ValueError(f'No release found for crash {crash_version}')
 
 
-def ensure_existing_cratedb(cratedb_version: Version) -> Version:
-    url = f'https://cdn.crate.io/downloads/releases/crate-{cratedb_version}.tar.gz'
+def ensure_existing_cratedb_release(cratedb_tarball: str) -> str:
+    url = RELEASE_URL + cratedb_tarball
     if url_exists(url):
-        return cratedb_version
+        return url
     else:
-        raise ValueError(f'No release found for CrateDB {cratedb_version}')
+        raise ValueError(f'No release found for CrateDB {cratedb_tarball}')
+
+
+def version_from_url(url: str) -> Optional[Version]:
+    pattern = re.compile(r"(.*/)?crate-(\d+.\d+.\d+)(-.*)?.tar.gz")
+    matches = pattern.match(url)
+    if matches:
+        return Version.parse(matches.group(2))
+    return None
 
 
 def find_template_for_version(cratedb_version: Version) -> str:
@@ -75,16 +85,31 @@ def find_template_for_version(cratedb_version: Version) -> str:
     return versioned_template if os.path.exists(versioned_template) else 'Dockerfile.j2'
 
 
-def main():
+def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cratedb-version', type=Version.parse, required=True)
+    cratedb = parser.add_mutually_exclusive_group(required=True)
+    cratedb.add_argument('--cratedb-version', type=Version.parse)
+    cratedb.add_argument('--cratedb-tarball', type=str)
     parser.add_argument('--crash-version', type=Version.parse)
     parser.add_argument('--jdk-version', type=Version.parse)
     parser.add_argument('--template', type=str)
+    return parser
+
+
+def main():
+    parser = get_parser()
     args = parser.parse_args()
 
-    cratedb_version = ensure_existing_cratedb(args.cratedb_version)
-    crash_version = ensure_existing_crash(args.crash_version)
+    if args.cratedb_version:
+        cratedb_version = args.cratedb_version
+        cratedb_url = ensure_existing_cratedb_release(f'crate-{cratedb_version}.tar.gz')
+    if args.cratedb_tarball:
+        cratedb_url = ensure_existing_cratedb_release(args.cratedb_tarball)
+        cratedb_version = version_from_url(cratedb_url)
+
+    assert cratedb_version and cratedb_url
+
+    crash_version, crash_url = ensure_existing_crash_release(args.crash_version)
     jdk_version_default = Version(12, 0, 1) if cratedb_version.major >= 4 else Version(11, 0, 1)
     jdk_version = args.jdk_version or jdk_version_default
     jdk_url, jdk_sha256 = jdk_url_and_sha(jdk_version)
@@ -94,8 +119,10 @@ def main():
     template = env.get_template(template)
     print(template.render(
         CRATE_VERSION=cratedb_version,
+        CRATE_URL=cratedb_url,
         CRASH_VERSION=crash_version,
-        JDK_VERSION=str(jdk_version),
+        CRASH_URL=crash_url,
+        JDK_VERSION=jdk_version,
         JDK_URL=jdk_url,
         JDK_SHA256=jdk_sha256,
         BUILD_TIMESTAMP=datetime.utcnow().isoformat()

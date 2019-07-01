@@ -1,3 +1,5 @@
+{%- set CRATE_TAR_GZ   = CRATE_URL.split("/")[-1] -%}
+{%- set CRATE_FILENAME = CRATE_TAR_GZ.replace(".tar.gz", "") -%}
 ## -*- docker-image-name: "docker-crate" -*-
 #
 # Crate Dockerfile
@@ -19,22 +21,22 @@ RUN apk add --no-cache --virtual .crate-rundeps \
     && apk add --no-cache --virtual .build-deps \
         gnupg \
         tar \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-{{ CRATE_VERSION }}.tar.gz \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-{{ CRATE_VERSION }}.tar.gz.asc \
+    && curl -fSL -O {{ CRATE_URL }} \
+    && curl -fSL -O {{ CRATE_URL }}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-{{ CRATE_VERSION }}.tar.gz.asc crate-{{ CRATE_VERSION }}.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-{{ CRATE_VERSION }}.tar.gz.asc \
-    && tar -xf crate-{{ CRATE_VERSION }}.tar.gz -C /crate --strip-components=1 \
-    && rm crate-{{ CRATE_VERSION }}.tar.gz \
+    && gpg --batch --verify {{ CRATE_TAR_GZ }}.asc {{ CRATE_TAR_GZ }} \
+    && rm -rf "$GNUPGHOME" {{ CRATE_TAR_GZ }}.asc \
+    && tar -xf {{ CRATE_TAR_GZ }} -C /crate --strip-components=1 \
+    && rm {{ CRATE_TAR_GZ }} \
     && ln -sf /usr/bin/python3 /usr/bin/python \
     && apk del .build-deps
 
 # install crash
 RUN apk add --no-cache --virtual .build-deps \
         gnupg \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_{{ CRASH_VERSION }}\
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_{{ CRASH_VERSION }}.asc \
+    && curl -fSL -O {{ CRASH_URL }} \
+    && curl -fSL -O {{ CRASH_URL }}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
     && gpg --batch --verify crash_standalone_{{ CRASH_VERSION }}.asc crash_standalone_{{ CRASH_VERSION }} \
