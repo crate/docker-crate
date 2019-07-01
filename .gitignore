@@ -4,3 +4,4 @@ bin/
 parts/
 .installed.cfg
 
+.mypy_cache/
