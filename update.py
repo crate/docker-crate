@@ -84,6 +84,7 @@ def main():
     args = parser.parse_args()
 
     cratedb_version = ensure_existing_cratedb(args.cratedb_version)
+    crash_version = ensure_existing_crash(args.crash_version)
     jdk_version_default = Version(12, 0, 1) if cratedb_version.major >= 4 else Version(11, 0, 1)
     jdk_version = args.jdk_version or jdk_version_default
     jdk_url, jdk_sha256 = jdk_url_and_sha(jdk_version)
@@ -92,8 +93,8 @@ def main():
     env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
     template = env.get_template(template)
     print(template.render(
-        CRATE_VERSION=ensure_existing_cratedb(args.cratedb_version),
-        CRASH_VERSION=ensure_existing_crash(args.crash_version),
+        CRATE_VERSION=cratedb_version,
+        CRASH_VERSION=crash_version,
         JDK_VERSION=str(jdk_version),
         JDK_URL=jdk_url,
         JDK_SHA256=jdk_sha256,
