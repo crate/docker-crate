@@ -1,0 +1,48 @@
+crate01:
+  image: crate
+  container_name: crate01
+  hostname: crate01
+  ports:
+    - 4201:4200
+  net: crate
+  volumes: 
+    - /tmp/crate/01:/data
+  command: >
+    crate -Cnetwork.host=_site_
+    -Cdiscovery.seed_hosts=crate02,crate03
+    -Ccluster.initial_master_nodes=crate01,crate02,crate03
+  environment:
+    - CRATE_HEAP_SIZE=2g
+
+crate02:
+  image: crate
+  container_name: crate02
+  hostname: crate02
+  ports:
+    - 4202:4200
+  net: crate
+  volumes: 
+    - /tmp/crate/02:/data
+  command: > 
+    crate -Cnetwork.host=_site_
+    -Cdiscovery.seed_hosts=crate01,crate03
+    -Ccluster.initial_master_nodes=crate01,crate02,crate03
+  environment:
+    - CRATE_HEAP_SIZE=2g
+
+crate03:
+  image: crate
+  container_name: crate03
+  hostname: crate03
+  ports:
+    - 4203:4200
+  net: crate
+  volumes: 
+    - /tmp/crate/03:/data
+  command: > 
+    crate -Cnetwork.host=_site_
+    -Cdiscovery.seed_hosts=crate01,crate02
+    -Ccluster.initial_master_nodes=crate01,crate02,crate03
+  environment:
+    - CRATE_HEAP_SIZE=2g
+
