@@ -129,6 +129,7 @@ if version is None and not options.accept_buildout_test_releases:
 
     def _final_version(parsed_version):
         for part in parsed_version:
+            part = "{}".format(part)
             if (part[:1] == '*') and (part not in _final_parts):
                 return False
         return True
@@ -142,7 +143,7 @@ if version is None and not options.accept_buildout_test_releases:
         bestv = None
         for dist in index[req.project_name]:
             distv = dist.parsed_version
-            if _final_version(distv):
+            if _final_version((distv,)):
                 if bestv is None or distv > bestv:
                     best = [dist]
                     bestv = distv
