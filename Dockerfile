@@ -8,15 +8,15 @@ FROM centos:7
 
 RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
 
-RUN curl --retry 8 -o /openjdk.tar.gz https://download.java.net/java/GA/jdk12.0.1/69cfe15208a647278a19ef0990eea691/12/GPL/openjdk-12.0.1_linux-x64_bin.tar.gz \
-    && echo "151eb4ec00f82e5e951126f572dc9116104c884d97f91be14ec11e85fc2dd626 */openjdk.tar.gz" | sha256sum -c - \
+RUN curl --retry 8 -o /openjdk.tar.gz https://download.java.net/java/GA/jdk13/5b8a42f3905b406298b72d750b6919f6/33/GPL/openjdk-13_linux-x64_bin.tar.gz \
+    && echo "5f547b8f0ffa7da517223f6f929a5055d749776b1878ccedbd6cc1334f4d6f4d */openjdk.tar.gz" | sha256sum -c - \
     && tar -C /opt -zxf /openjdk.tar.gz \
     && rm /openjdk.tar.gz
 
-ENV JAVA_HOME /opt/jdk-12.0.1
+ENV JAVA_HOME /opt/jdk-13
 
 # REF: https://github.com/elastic/elasticsearch-docker/issues/171
-RUN ln -sf /etc/pki/ca-trust/extracted/java/cacerts /opt/jdk-12.0.1/lib/security/cacerts
+RUN ln -sf /etc/pki/ca-trust/extracted/java/cacerts /opt/jdk-13/lib/security/cacerts
 
 # install crate
 RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
