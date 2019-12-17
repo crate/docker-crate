@@ -1,21 +1,15 @@
-# -*- coding: utf-8 -*-
 # vim: set fileencodings=utf-8
 
 __docformat__ = "reStructuredText"
 
 import os
 import sys
-import json
-
 import docker
 import unittest
 
-from requests.exceptions import ConnectionError
-
-from utils import print_build_output
-from itests import SimpleRunTest, JavaPropertiesTest, \
-    CrateHeapSizeTest, CrateJavaOptsTest, NodeStatsTest, TarballRemovedTest, \
-    MountedDataDirectoryTest
+from .utils import print_build_output
+from .itests import SimpleRunTest,  JavaPropertiesTest, CrateHeapSizeTest, \
+    CrateJavaOptsTest, NodeStatsTest, TarballRemovedTest, MountedDataDirectoryTest
 
 DIR = os.path.dirname(__file__)
 
