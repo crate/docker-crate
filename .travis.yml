@@ -15,11 +15,10 @@ before_install:
   - docker images
 
 install:
-  - python bootstrap.py
-  - bin/buildout
+  - pip install -r requirements.txt
 
 script:
-  - bin/test -vvv
+  - zope-testrunner --path . -s tests --color
 
 notifications:
   email: false

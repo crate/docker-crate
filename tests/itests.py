@@ -1,28 +1,22 @@
-# -*- coding: utf-8 -*-
 # vim: set fileencodings=utf-8
 #
 # Docker Integration Tests
 
-from __future__ import absolute_import
-
 import re
-import sys
 import time
+import unittest
 
 from tempfile import mkdtemp
 from shutil import rmtree
-
 from psycopg2 import connect
-from unittest import TestCase
-
-from utils import print_debug
+from .utils import print_debug
 
 
 class InvalidState(Exception):
     pass
 
 
-class DockerBaseTestCase(TestCase):
+class DockerBaseTestCase(unittest.TestCase):
 
     def __init__(self, layer):
         super(DockerBaseTestCase, self).__init__('testRun')
@@ -37,7 +31,7 @@ class DockerBaseTestCase(TestCase):
         if self.cli.info()['OperatingSystem'].startswith(u'Boot2Docker'):
             import subprocess
             crate_ip = subprocess.check_output(r'docker-machine ip',
-                stderr=None, shell=True).decode("utf-8").strip('\n')
+                                               stderr=None, shell=True).decode("utf-8").strip('\n')
         return connect(host=crate_ip, port=port, user=user)
 
     def start(self, cmd=['crate'], ports={}, env=[], volumes={}):
@@ -52,7 +46,7 @@ class DockerBaseTestCase(TestCase):
         )
 
         self.assertTrue(len(cmd) >= 1)
-        self.assertEquals(cmd[0], 'crate')
+        self.assertEqual(cmd[0], 'crate')
 
         cmd[1:1] = [
             '-Cbootstrap.memory_lock=true',
@@ -125,10 +119,11 @@ class DockerBaseTestCase(TestCase):
             if l.endswith('started'):
                 break
 
+
 def docker(cmd, ports={}, env=[], volumes={}):
     def wrap(fn):
         def inner_fn(self, *args, **kwargs):
-            print(self.__class__.__doc__)
+            print_debug(self.__class__.__doc__)
             self.start(cmd=cmd, ports=ports, env=env, volumes=volumes)
             fn(self)
         return inner_fn
