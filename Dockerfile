@@ -70,14 +70,13 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="2019-12-10T13:14:43.986536" \
-    org.label-schema.name="crate" \
-    org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
-    org.label-schema.url="https://crate.io/products/cratedb/" \
-    org.label-schema.vcs-url="https://github.com/crate/docker-crate" \
-    org.label-schema.vendor="Crate.io" \
-    org.label-schema.version="4.0.10"
+    org.opencontainers.image.created="2019-12-10T13:14:43.986536" \
+    org.opencontainers.image.title="crate" \
+    org.opencontainers.image.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
+    org.opencontainers.image.url="https://crate.io/products/cratedb/" \
+    org.opencontainers.image.source="https://github.com/crate/docker-crate" \
+    org.opencontainers.image.vendor="Crate.io" \
+    org.opencontainers.image.version="4.0.10"
 
 COPY docker-entrypoint.sh /
 
