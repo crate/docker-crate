@@ -12,6 +12,7 @@ from urllib.request import urlopen, Request
 
 RELEASE_URL = 'https://cdn.crate.io/downloads/releases/'
 JDK_URLS = {
+    (13, 0, 1): 'https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz',
     (12, 0, 1): 'https://download.java.net/java/GA/jdk12.0.1/69cfe15208a647278a19ef0990eea691/12/GPL/openjdk-12.0.1_linux-x64_bin.tar.gz',
     (11, 0, 1): 'https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz'
 }
@@ -110,7 +111,12 @@ def main():
     assert cratedb_version and cratedb_url
 
     crash_version, crash_url = ensure_existing_crash_release(args.crash_version)
-    jdk_version_default = Version(12, 0, 1) if cratedb_version.major >= 4 else Version(11, 0, 1)
+    if cratedb_version >= (4, 1, 0):
+        jdk_version_default = Version(13, 0, 1)
+    elif cratedb_version >= (4, 0, 0):
+        jdk_version_default = Version(12, 0, 1)
+    else:
+        jdk_version_default = Version(11, 0, 1)
     jdk_version = args.jdk_version or jdk_version_default
     jdk_url, jdk_sha256 = jdk_url_and_sha(jdk_version)
     template = args.template or find_template_for_version(cratedb_version)
