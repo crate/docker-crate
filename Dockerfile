@@ -8,15 +8,15 @@ FROM centos:7
 
 RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
 
-RUN curl --retry 8 -o /openjdk.tar.gz https://download.java.net/java/GA/jdk12.0.1/69cfe15208a647278a19ef0990eea691/12/GPL/openjdk-12.0.1_linux-x64_bin.tar.gz \
-    && echo "151eb4ec00f82e5e951126f572dc9116104c884d97f91be14ec11e85fc2dd626 */openjdk.tar.gz" | sha256sum -c - \
+RUN curl --retry 8 -o /openjdk.tar.gz https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz \
+    && echo "2e01716546395694d3fad54c9b36d1cd46c5894c06f72d156772efbcf4b41335 */openjdk.tar.gz" | sha256sum -c - \
     && tar -C /opt -zxf /openjdk.tar.gz \
     && rm /openjdk.tar.gz
 
-ENV JAVA_HOME /opt/jdk-12.0.1
+ENV JAVA_HOME /opt/jdk-13.0.1
 
 # REF: https://github.com/elastic/elasticsearch-docker/issues/171
-RUN ln -sf /etc/pki/ca-trust/extracted/java/cacerts /opt/jdk-12.0.1/lib/security/cacerts
+RUN ln -sf /etc/pki/ca-trust/extracted/java/cacerts /opt/jdk-13.0.1/lib/security/cacerts
 
 # install crate
 RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
@@ -24,14 +24,14 @@ RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
     && yum install -y python36u openssl \
     && yum clean all \
     && rm -rf /var/cache/yum \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.0.11.tar.gz \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.0.11.tar.gz.asc \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.1.0.tar.gz \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.1.0.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-4.0.11.tar.gz.asc crate-4.0.11.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-4.0.11.tar.gz.asc \
-    && tar -xf crate-4.0.11.tar.gz -C /crate --strip-components=1 \
-    && rm crate-4.0.11.tar.gz \
+    && gpg --batch --verify crate-4.1.0.tar.gz.asc crate-4.1.0.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-4.1.0.tar.gz.asc \
+    && tar -xf crate-4.1.0.tar.gz -C /crate --strip-components=1 \
+    && rm crate-4.1.0.tar.gz \
     && ln -sf /usr/bin/python3.6 /usr/bin/python3 \
     && ln -sf /usr/bin/python3.6 /usr/bin/python
 
@@ -70,13 +70,13 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.opencontainers.image.created="2020-01-15T10:59:10.827160" \
+    org.opencontainers.image.created="2020-01-15T14:41:10.058539" \
     org.opencontainers.image.title="crate" \
     org.opencontainers.image.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.opencontainers.image.url="https://crate.io/products/cratedb/" \
     org.opencontainers.image.source="https://github.com/crate/docker-crate" \
     org.opencontainers.image.vendor="Crate.io" \
-    org.opencontainers.image.version="4.0.11"
+    org.opencontainers.image.version="4.1.0"
 
 COPY docker-entrypoint.sh /
 
