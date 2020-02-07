@@ -196,7 +196,7 @@ class CrateJavaOptsTest(DockerBaseTestCase):
         # crate docker java options
         self.assertTrue('+UnlockExperimentalVMOptions' in opts)
         # default java options
-        self.assertTrue('+UseConcMarkSweepGC' in opts)
+        self.assertTrue('+UseG1GC' in opts)
         self.assertTrue('+DisableExplicitGC' in opts)
 
         # check -D process arguments
