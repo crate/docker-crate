@@ -19,9 +19,9 @@ ENV JAVA_HOME /opt/jdk-13.0.1
 RUN ln -sf /etc/pki/ca-trust/extracted/java/cacerts /opt/jdk-13.0.1/lib/security/cacerts
 
 # install crate
-RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
+RUN yum install -y yum-utils \
     && yum makecache \
-    && yum install -y python36u openssl \
+    && yum install -y python36 openssl \
     && yum clean all \
     && rm -rf /var/cache/yum \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.1.1.tar.gz \
