@@ -24,14 +24,14 @@ RUN yum install -y yum-utils \
     && yum install -y python36 openssl \
     && yum clean all \
     && rm -rf /var/cache/yum \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.1.1.tar.gz \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.1.1.tar.gz.asc \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.1.2.tar.gz \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-4.1.2.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-4.1.1.tar.gz.asc crate-4.1.1.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-4.1.1.tar.gz.asc \
-    && tar -xf crate-4.1.1.tar.gz -C /crate --strip-components=1 \
-    && rm crate-4.1.1.tar.gz \
+    && gpg --batch --verify crate-4.1.2.tar.gz.asc crate-4.1.2.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-4.1.2.tar.gz.asc \
+    && tar -xf crate-4.1.2.tar.gz -C /crate --strip-components=1 \
+    && rm crate-4.1.2.tar.gz \
     && ln -sf /usr/bin/python3.6 /usr/bin/python3 \
     && ln -sf /usr/bin/python3.6 /usr/bin/python
 
@@ -70,13 +70,13 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.opencontainers.image.created="2020-01-30T16:58:47.735176" \
+    org.opencontainers.image.created="2020-02-14T15:29:55.666729" \
     org.opencontainers.image.title="crate" \
     org.opencontainers.image.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.opencontainers.image.url="https://crate.io/products/cratedb/" \
     org.opencontainers.image.source="https://github.com/crate/docker-crate" \
     org.opencontainers.image.vendor="Crate.io" \
-    org.opencontainers.image.version="4.1.1"
+    org.opencontainers.image.version="4.1.2"
 
 COPY docker-entrypoint.sh /
 
