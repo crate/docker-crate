@@ -10,6 +10,16 @@ FROM centos:7
 
 RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
 
+RUN curl --retry 8 -o /openjdk.tar.gz {{ JDK_URL }} \
+    && echo "{{ JDK_SHA256 }} */openjdk.tar.gz" | sha256sum -c - \
+    && tar -C /opt -zxf /openjdk.tar.gz \
+    && rm /openjdk.tar.gz
+
+ENV JAVA_HOME /opt/jdk-{{ JDK_VERSION }}
+
+# REF: https://github.com/elastic/elasticsearch-docker/issues/171
+RUN ln -sf /etc/pki/ca-trust/extracted/java/cacerts /opt/jdk-{{ JDK_VERSION }}/lib/security/cacerts
+
 # install crate
 RUN yum install -y yum-utils \
     && yum makecache \
