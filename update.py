@@ -101,7 +101,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '--platform',
         type=str,
-        required=True,
+        default="x64_linux",
         choices=['x64_linux', 'aarch64_linux'],
         help='The target system architecture.')
     parser.add_argument('--crash-version', type=Version.parse)

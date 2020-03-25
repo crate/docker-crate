@@ -1,0 +1,31 @@
+---
+name: CrateDB Docker images test
+on: [push]
+
+jobs:
+  test:
+    name: "Test CrateDB docker image: latest-testing:${{ matrix.platform }}"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [x64_linux]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip --quiet
+          pip install -r requirements.txt --quiet
+      - name: Build CrateDB Docker image
+        run: |
+          VERSION=$(curl -s https://crate.io/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
+          ARCH=$([ "${{ matrix.platform }}" = "aarch64_linux" ] && echo "arm64v8" || echo "amd64")
+          ./update.py --cratedb-version ${VERSION} --platform ${{ matrix.platform }} > "${ARCH}/crate/Dockerfile"
+          docker build -t "crate/crate:${{ matrix.platform }}" "${ARCH}/crate"
+      - name: Run Docker official images tests
+        run: |
+          git clone https://github.com/docker-library/official-images.git ~/official-images
+          ~/official-images/test/run.sh "crate/crate:${{ matrix.platform }}"
