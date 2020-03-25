@@ -18,7 +18,9 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - zope-testrunner --path . -s tests --color
+  - VERSION=$(curl -s https://crate.io/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
+  - ./update.py --cratedb-version ${VERSION} --platform "x64_linux" > amd64/crate/Dockerfile
+  - PATH_TO_IMAGE=amd64/crate zope-testrunner --path . -s tests --color
 
 notifications:
   email: false

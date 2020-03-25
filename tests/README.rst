@@ -48,4 +48,6 @@ For CrateDB >= 1.2 you would need to change the following setting in your docker
 
 To run the tests::
 
-  >>> zope-testrunner --path . -s tests --color
+  >>> PATH_TO_IMAGE=amd64/crate zope-testrunner --path . -s tests --color
+
+Where ``PATH_TO_IMAGE`` is a root-relative path to a folder with a Dockerfile.

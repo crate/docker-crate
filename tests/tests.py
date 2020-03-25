@@ -36,9 +36,13 @@ class DockerLayer(object):
 
     def start(self):
         sys.stdout.write('\nBuilding container {}\n'.format(self.tag))
+        path_to_image = os.path.join(DIR, '..', os.environ.get('PATH_TO_IMAGE'))
+        print(os.path.abspath(path_to_image))
         for line in self.client.build(
-                path=os.path.abspath(os.path.join(DIR, '..')),
-                tag=self.tag, rm=True, forcerm=True):
+                path=os.path.abspath(path_to_image),
+                tag=self.tag,
+                rm=True,
+                forcerm=True):
             print_build_output(line)
         sys.stdout.write('\n')
 

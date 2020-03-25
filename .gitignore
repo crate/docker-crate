@@ -4,4 +4,8 @@ bin/
 parts/
 .installed.cfg
 
+.idea/
+
+.venv/
+
 .mypy_cache/
