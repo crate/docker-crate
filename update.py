@@ -9,8 +9,11 @@ from jinja2 import Environment, FileSystemLoader
 from typing import NamedTuple, Optional, Tuple
 from urllib.error import URLError
 from urllib.request import urlopen, Request
+from urllib.parse import urljoin
 
 RELEASE_URL = 'https://cdn.crate.io/downloads/releases/'
+CRATEDB_RELEASE_URL = 'https://cdn.crate.io/downloads/releases/cratedb/'
+
 JDK_URLS = {
     (13, 0, 1): 'https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz',
     (12, 0, 1): 'https://download.java.net/java/GA/jdk12.0.1/69cfe15208a647278a19ef0990eea691/12/GPL/openjdk-12.0.1_linux-x64_bin.tar.gz',
@@ -64,8 +67,12 @@ def ensure_existing_crash_release(crash_version: Version) -> Tuple[Version, str]
         raise ValueError(f'No release found for crash {crash_version}')
 
 
-def ensure_existing_cratedb_release(cratedb_tarball: str) -> str:
-    url = RELEASE_URL + cratedb_tarball
+def ensure_existing_cratedb_release(cratedb_version: Version, platform: str) -> str:
+    cratedb_tarball = f'crate-{cratedb_version}.tar.gz'
+    if cratedb_version >= (4, 2, 0):
+        url = urljoin(CRATEDB_RELEASE_URL, platform, cratedb_tarball)
+    else:
+        url = urljoin(RELEASE_URL, cratedb_tarball)
     if url_exists(url):
         return url
     else:
@@ -91,6 +98,12 @@ def get_parser() -> argparse.ArgumentParser:
     cratedb = parser.add_mutually_exclusive_group(required=True)
     cratedb.add_argument('--cratedb-version', type=Version.parse)
     cratedb.add_argument('--cratedb-tarball', type=str)
+    parser.add_argument(
+        '--platform',
+        type=str,
+        required=True,
+        choices=['x64_linux', 'aarch64_linux'],
+        help='The target system architecture.')
     parser.add_argument('--crash-version', type=Version.parse)
     parser.add_argument('--jdk-version', type=Version.parse)
     parser.add_argument('--template', type=str)
@@ -101,9 +114,11 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
 
+    platform = args.platform
+    base_image = "arm64v8/centos:7" if platform == "aarch64_linux" else "centos:7"
     if args.cratedb_version:
         cratedb_version = args.cratedb_version
-        cratedb_url = ensure_existing_cratedb_release(f'crate-{cratedb_version}.tar.gz')
+        cratedb_url = ensure_existing_cratedb_release(cratedb_version, platform)
     if args.cratedb_tarball:
         cratedb_url = ensure_existing_cratedb_release(args.cratedb_tarball)
         cratedb_version = version_from_url(cratedb_url)
@@ -121,6 +136,7 @@ def main():
     jdk_url, jdk_sha256 = jdk_url_and_sha(jdk_version)
     template = args.template or find_template_for_version(cratedb_version)
 
+
     env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
     template = env.get_template(template)
     print(template.render(
@@ -128,6 +144,7 @@ def main():
         CRATE_URL=cratedb_url,
         CRASH_VERSION=crash_version,
         CRASH_URL=crash_url,
+        BASE_IMAGE=base_image,
         JDK_VERSION=jdk_version,
         JDK_URL=jdk_url,
         JDK_SHA256=jdk_sha256,
