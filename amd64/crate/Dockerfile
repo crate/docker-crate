@@ -35,9 +35,6 @@ RUN yum install -y yum-utils \
     && ln -sf /usr/bin/python3.6 /usr/bin/python3 \
     && ln -sf /usr/bin/python3.6 /usr/bin/python
 
-COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
-COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
-
 # install crash
 RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2 \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2.asc \
