@@ -33,7 +33,8 @@ RUN yum install -y yum-utils \
     && tar -xf crate-4.1.5.tar.gz -C /crate --strip-components=1 \
     && rm crate-4.1.5.tar.gz \
     && ln -sf /usr/bin/python3.6 /usr/bin/python3 \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python
+    && ln -sf /usr/bin/python3.6 /usr/bin/python \
+    && sed -i '1s/\/usr\/bin\/python/\/usr\/bin\/python2/g' /usr/bin/yum
 
 # install crash
 RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2 \
