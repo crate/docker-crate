@@ -24,8 +24,7 @@ RUN yum install -y yum-utils \
     && rm -rf "$GNUPGHOME" {{ CRATE_TAR_GZ }}.asc \
     && tar -xf {{ CRATE_TAR_GZ }} -C /crate --strip-components=1 \
     && rm {{ CRATE_TAR_GZ }} \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python3 \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python
+    && ln -sf /usr/bin/python3.6 /usr/bin/python3
 
 # install crash
 RUN curl -fSL -O {{ CRASH_URL }} \

@@ -32,8 +32,7 @@ RUN yum install -y yum-utils \
     && rm -rf "$GNUPGHOME" crate-4.1.5.tar.gz.asc \
     && tar -xf crate-4.1.5.tar.gz -C /crate --strip-components=1 \
     && rm crate-4.1.5.tar.gz \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python3 \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python
+    && ln -sf /usr/bin/python3.6 /usr/bin/python3
 
 # install crash
 RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2 \
