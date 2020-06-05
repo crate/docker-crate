@@ -69,10 +69,13 @@ def ensure_existing_crash_release(crash_version: Version) -> Tuple[Version, str]
 
 def ensure_existing_cratedb_release(cratedb_version: Version, platform: str) -> str:
     cratedb_tarball = f'crate-{cratedb_version}.tar.gz'
-    if cratedb_version >= (4, 2, 0):
-        url = urljoin(CRATEDB_RELEASE_URL, platform, cratedb_tarball)
+    if isinstance(cratedb_version, tuple):
+        if cratedb_version >= (4, 2, 0):
+            url = urljoin(urljoin(CRATEDB_RELEASE_URL, platform), cratedb_tarball)
+        else:
+            url = urljoin(RELEASE_URL, cratedb_tarball)
     else:
-        url = urljoin(RELEASE_URL, cratedb_tarball)
+        url = urljoin(RELEASE_URL, cratedb_version)
     if url_exists(url):
         return url
     else:
@@ -120,7 +123,7 @@ def main():
         cratedb_version = args.cratedb_version
         cratedb_url = ensure_existing_cratedb_release(cratedb_version, platform)
     if args.cratedb_tarball:
-        cratedb_url = ensure_existing_cratedb_release(args.cratedb_tarball)
+        cratedb_url = ensure_existing_cratedb_release(args.cratedb_tarball, platform)
         cratedb_version = version_from_url(cratedb_url)
 
     assert cratedb_version and cratedb_url
@@ -135,7 +138,6 @@ def main():
     jdk_version = args.jdk_version or jdk_version_default
     jdk_url, jdk_sha256 = jdk_url_and_sha(jdk_version)
     template = args.template or find_template_for_version(cratedb_version)
-
 
     env = Environment(loader=FileSystemLoader(os.path.dirname(__file__)))
     template = env.get_template(template)
