@@ -71,7 +71,7 @@ def ensure_existing_cratedb_release(cratedb_version: Version, platform: str) -> 
     cratedb_tarball = f'crate-{cratedb_version}.tar.gz'
     if isinstance(cratedb_version, tuple):
         if cratedb_version >= (4, 2, 0):
-            url = urljoin(urljoin(CRATEDB_RELEASE_URL, platform), cratedb_tarball)
+            url = urljoin(urljoin(CRATEDB_RELEASE_URL, platform + '/'), cratedb_tarball)
         else:
             url = urljoin(RELEASE_URL, cratedb_tarball)
     else:
@@ -79,7 +79,7 @@ def ensure_existing_cratedb_release(cratedb_version: Version, platform: str) -> 
     if url_exists(url):
         return url
     else:
-        raise ValueError(f'No release found for CrateDB {cratedb_tarball}')
+        raise ValueError(f'No release found for CrateDB {cratedb_tarball} at {url}')
 
 
 def version_from_url(url: str) -> Optional[Version]:
