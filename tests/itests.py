@@ -193,8 +193,6 @@ class CrateJavaOptsTest(DockerBaseTestCase):
         process = self.crate_process()
         res = re.findall(r'-XX:[\S]+', process)
         opts = [r[4:] for r in res]  # strip -XX: prefix
-        # crate docker java options
-        self.assertTrue('+UnlockExperimentalVMOptions' in opts)
         # default java options
         self.assertTrue('+UseG1GC' in opts)
         self.assertTrue('+DisableExplicitGC' in opts)

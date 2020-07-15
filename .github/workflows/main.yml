@@ -55,4 +55,3 @@ jobs:
         run: |
           git clone https://github.com/docker-library/official-images.git ~/official-images
           ~/official-images/test/run.sh crate/crate:aarch64_linux
-  
