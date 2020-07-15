@@ -101,7 +101,7 @@ class DockerBaseTestCase(unittest.TestCase):
 
         for proc in procs:
             for p in proc:
-                if p.startswith('/opt/jdk'):
+                if p.startswith('/opt/jdk') or p.startswith('/crate/jdk'):
                     print_debug('>>>', p)
                     return p
         return ''
