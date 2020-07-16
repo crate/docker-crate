@@ -14,24 +14,24 @@ RUN yum install -y yum-utils \
     && yum install -y python36 openssl \
     && yum clean all \
     && rm -rf /var/cache/yum \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/cratedb/aarch64_linux/crate-4.2.0.tar.gz \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/cratedb/aarch64_linux/crate-4.2.0.tar.gz.asc \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/cratedb/aarch64_linux/crate-4.2.1.tar.gz \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/cratedb/aarch64_linux/crate-4.2.1.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-4.2.0.tar.gz.asc crate-4.2.0.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-4.2.0.tar.gz.asc \
-    && tar -xf crate-4.2.0.tar.gz -C /crate --strip-components=1 \
-    && rm crate-4.2.0.tar.gz \
+    && gpg --batch --verify crate-4.2.1.tar.gz.asc crate-4.2.1.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-4.2.1.tar.gz.asc \
+    && tar -xf crate-4.2.1.tar.gz -C /crate --strip-components=1 \
+    && rm crate-4.2.1.tar.gz \
     && ln -sf /usr/bin/python3.6 /usr/bin/python3
 
 # install crash
-RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2 \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.24.2.asc \
+RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.25.0 \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.25.0.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crash_standalone_0.24.2.asc crash_standalone_0.24.2 \
-    && rm -rf "$GNUPGHOME" crash_standalone_0.24.2.asc \
-    && mv crash_standalone_0.24.2 /usr/local/bin/crash \
+    && gpg --batch --verify crash_standalone_0.25.0.asc crash_standalone_0.25.0 \
+    && rm -rf "$GNUPGHOME" crash_standalone_0.25.0.asc \
+    && mv crash_standalone_0.25.0 /usr/local/bin/crash \
     && chmod +x /usr/local/bin/crash
 
 ENV PATH /crate/bin:$PATH
@@ -56,13 +56,13 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.opencontainers.image.created="2020-07-07T19:06:55.297961" \
+    org.opencontainers.image.created="2020-07-16T09:29:18.862556" \
     org.opencontainers.image.title="crate" \
     org.opencontainers.image.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.opencontainers.image.url="https://crate.io/products/cratedb/" \
     org.opencontainers.image.source="https://github.com/crate/docker-crate" \
     org.opencontainers.image.vendor="Crate.io" \
-    org.opencontainers.image.version="4.2.0"
+    org.opencontainers.image.version="4.2.1"
 
 COPY docker-entrypoint.sh /
 
