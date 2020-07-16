@@ -3,28 +3,6 @@ name: CrateDB Docker images test
 on: [push]
 
 jobs:
-  amd64:
-    name: Test CrateDB docker image on amd64
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.7
-      - name: Install tests dependencies
-        run: |
-          python -m pip install --upgrade pip --quiet
-          pip install -r requirements.txt --quiet
-      - name: Build CrateDB Docker image
-        run: |
-          VERSION=$(curl -s https://crate.io/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
-          ./update.py --cratedb-version ${VERSION} --platform x64_linux > amd64/crate/Dockerfile
-          docker build -t crate/crate:x64_linux amd64/crate
-      - name: Run Docker official images tests
-        run: |
-          git clone https://github.com/docker-library/official-images.git ~/official-images
-          ~/official-images/test/run.sh crate/crate:x64_linux
   arm64v8:
     name: Test CrateDB docker image on arm64v8
     runs-on: ubuntu-18.04
@@ -51,7 +29,4 @@ jobs:
           VERSION=$(curl -s https://crate.io/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
           ./update.py --cratedb-version ${VERSION} --platform aarch64_linux > arm64v8/crate/Dockerfile
           docker build -t crate/crate:aarch64_linux arm64v8/crate
-      - name: Run Docker official images tests
-        run: |
-          git clone https://github.com/docker-library/official-images.git ~/official-images
-          ~/official-images/test/run.sh crate/crate:aarch64_linux
+          docker run crate/crate:aarch64_linux
