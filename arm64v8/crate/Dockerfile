@@ -4,7 +4,7 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM arm64v8/centos:7
+FROM centos:7
 
 RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
 
