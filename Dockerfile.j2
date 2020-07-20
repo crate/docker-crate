@@ -1,12 +1,11 @@
-{%- set CRATE_TAR_GZ   = CRATE_URL.split("/")[-1] -%}
-{%- set CRATE_FILENAME = CRATE_TAR_GZ.replace(".tar.gz", "") -%}
+{%- set CRATE_TAR_GZ   = "crate-{}.tar.gz".format(CRATE_VERSION) -%}
 ## -*- docker-image-name: "docker-crate" -*-
 #
 # Crate Dockerfile
 # https://github.com/crate/docker-crate
 #
 
-FROM {{ BASE_IMAGE }}
+FROM centos:7
 
 RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
 
@@ -16,8 +15,14 @@ RUN yum install -y yum-utils \
     && yum install -y python36 openssl \
     && yum clean all \
     && rm -rf /var/cache/yum \
-    && curl -fSL -O {{ CRATE_URL }} \
-    && curl -fSL -O {{ CRATE_URL }}.asc \
+    && export PLATFORM="$( \
+        case $(uname --m) in \
+            x86_64)  echo x64_linux ;; \
+            aarch64) echo aarch64_linux ;; \
+        esac)" \
+    && export CRATE_URL={{ CRATE_RELEASE_URL }}/${PLATFORM}/{{ CRATE_TAR_GZ }} \
+    && curl -fSL -O ${CRATE_URL} \
+    && curl -fSL -O ${CRATE_URL}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
     && gpg --batch --verify {{ CRATE_TAR_GZ }}.asc {{ CRATE_TAR_GZ }} \

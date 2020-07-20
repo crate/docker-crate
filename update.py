@@ -12,7 +12,7 @@ from urllib.request import urlopen, Request
 from urllib.parse import urljoin
 
 RELEASE_URL = 'https://cdn.crate.io/downloads/releases/'
-CRATEDB_RELEASE_URL = 'https://cdn.crate.io/downloads/releases/cratedb/'
+CRATEDB_RELEASE_URL = 'https://cdn.crate.io/downloads/releases/cratedb'
 
 JDK_URLS = {
     (13, 0, 1): 'https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz',
@@ -71,7 +71,7 @@ def ensure_existing_cratedb_release(cratedb_version: Version, platform: str) -> 
     cratedb_tarball = f'crate-{cratedb_version}.tar.gz'
     if isinstance(cratedb_version, tuple):
         if cratedb_version >= (4, 2, 0):
-            url = urljoin(urljoin(CRATEDB_RELEASE_URL, platform + '/'), cratedb_tarball)
+            url = urljoin(urljoin(CRATEDB_RELEASE_URL + '/', platform + '/'), cratedb_tarball)
         else:
             url = urljoin(RELEASE_URL, cratedb_tarball)
     else:
@@ -118,7 +118,6 @@ def main():
     args = parser.parse_args()
 
     platform = args.platform
-    base_image = "arm64v8/centos:7" if platform == "aarch64_linux" else "centos:7"
     if args.cratedb_version:
         cratedb_version = args.cratedb_version
         cratedb_url = ensure_existing_cratedb_release(cratedb_version, platform)
@@ -143,10 +142,10 @@ def main():
     template = env.get_template(template)
     print(template.render(
         CRATE_VERSION=cratedb_version,
-        CRATE_URL=cratedb_url,
+        CRATE_RELEASE_URL=CRATEDB_RELEASE_URL,
+        CRATE_URL=cratedb_url, # for versions < 4.2
         CRASH_VERSION=crash_version,
         CRASH_URL=crash_url,
-        BASE_IMAGE=base_image,
         JDK_VERSION=jdk_version,
         JDK_URL=jdk_url,
         JDK_SHA256=jdk_sha256,
