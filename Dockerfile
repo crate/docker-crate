@@ -21,7 +21,7 @@ RUN ln -sf /etc/pki/ca-trust/extracted/java/cacerts /opt/jdk-11.0.1/lib/security
 # install crate
 RUN yum install -y yum-utils https://centos7.iuscommunity.org/ius-release.rpm \
     && yum makecache \
-    && yum install -y python36u openssl \
+    && yum install -y python36 openssl \
     && yum clean all \
     && rm -rf /var/cache/yum \
     && curl -fSL -O https://cdn.crate.io/downloads/releases/crate-3.3.5.tar.gz \
@@ -71,7 +71,7 @@ COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
     org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="2019-07-08T14:08:18.187344" \
+    org.label-schema.build-date="2020-08-20T09:47:47.048235" \
     org.label-schema.name="crate" \
     org.label-schema.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.label-schema.url="https://crate.io/products/cratedb/" \

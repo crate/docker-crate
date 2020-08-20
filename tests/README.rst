@@ -6,18 +6,19 @@ Crate Docker Image Development
 Running Tests
 -------------
 
-This project uses `buildout <https://pypi.python.org/pypi/zc.buildout/>`_
-to setup the testing environment for ``docker-crate``.
+Create a virtual environment::
 
-Run ``bootstrap.py``::
+  >>> python3 -m venv .venv
 
-  >>> python3.4 bootstrap.py
+Then activate it::
 
-And afterwards run buildout::
+  >>> source .venv/bin/activate
 
-  >>> ./bin/buildout -N
+Now use pip to install the dependencies::
 
-Additionally it requires `Docker <https://www.docker.com>`_ version `1.10.x`
+  >>> pip install -r requirements.txt
+
+The tests require `Docker <https://www.docker.com>`_ version `1.10.x`
 with API version `1.22` to be installed on the local machine::
 
   >>> docker version
@@ -45,7 +46,6 @@ For CrateDB >= 1.2 you would need to change the following setting in your docker
 
   >>> docker-machine ssh default "sudo sysctl -w vm.max_map_count=262144"
 
-The tests are run using the `zope.testrunner <https://pypi.python.org/pypi/zope.testrunner>`_.
 To run the tests::
 
-  >>> ./bin/test
+  >>> zope-testrunner --path . -s tests --color
