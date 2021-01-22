@@ -13,6 +13,7 @@ from urllib.parse import urljoin
 
 RELEASE_URL = 'https://cdn.crate.io/downloads/releases/'
 CRATEDB_RELEASE_URL = 'https://cdn.crate.io/downloads/releases/cratedb'
+CRATEDB_NIGHTLY_URL = 'https://cdn.crate.io/downloads/releases/nightly'
 
 JDK_URLS = {
     (13, 0, 1): 'https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz',
@@ -25,13 +26,23 @@ class Version(NamedTuple):
     major: int
     minor: int
     hotfix: int
+    snapshot: str = None
 
     @classmethod
     def parse(cls, s: str):
-        return Version(*map(int, s.split('.', maxsplit=2))) if s else None
+        if s is None:
+            return None
+        parts = s.split('.', maxsplit=2)
+        snapshot_parts = parts[2].split('-', maxsplit=1)
+        if len(snapshot_parts) > 1:
+            return Version(int(parts[0]), int(parts[1]), int(snapshot_parts[0]), snapshot_parts[1])
+        return Version(*map(int, parts))
 
     def __str__(self) -> str:
-        return f'{self.major}.{self.minor}.{self.hotfix}'
+        if self.snapshot is None:
+            return f'{self.major}.{self.minor}.{self.hotfix}'
+        return f'{self.major}.{self.minor}.{self.hotfix}-{self.snapshot}'
+
 
 
 def latest_crash() -> Version:
@@ -83,7 +94,7 @@ def ensure_existing_cratedb_release(cratedb_version: Version, platform: str) -> 
 
 
 def version_from_url(url: str) -> Optional[Version]:
-    pattern = re.compile(r"(.*/)?crate-(\d+.\d+.\d+)(-.*)?.tar.gz")
+    pattern = re.compile(r"(.*/)?crate-(\d+.\d+.\d+(?:-.*)?).tar.gz")
     matches = pattern.match(url)
     if matches:
         return Version.parse(matches.group(2))
@@ -92,8 +103,13 @@ def version_from_url(url: str) -> Optional[Version]:
 
 def find_template_for_version(cratedb_version: Version) -> str:
     v = cratedb_version
-    versioned_template = f'Dockerfile_{v.major}.{v.minor}.j2'
-    return versioned_template if os.path.exists(versioned_template) else 'Dockerfile.j2'
+    if v.snapshot is not None:
+        template = 'Dockerfile_nightly.j2'
+        versioned_template = f'Dockerfile_{v.major}.{v.minor}_nightly.j2'
+    else:
+        template = 'Dockerfile.j2'
+        versioned_template = f'Dockerfile_{v.major}.{v.minor}.j2'
+    return versioned_template if os.path.exists(versioned_template) else template
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -129,11 +145,11 @@ def main():
 
     crash_version, crash_url = ensure_existing_crash_release(args.crash_version)
     if cratedb_version >= (4, 1, 0):
-        jdk_version_default = Version(13, 0, 1)
+        jdk_version_default = (13, 0, 1)
     elif cratedb_version >= (4, 0, 0):
-        jdk_version_default = Version(12, 0, 1)
+        jdk_version_default = (12, 0, 1)
     else:
-        jdk_version_default = Version(11, 0, 1)
+        jdk_version_default = (11, 0, 1)
     jdk_version = args.jdk_version or jdk_version_default
     jdk_url, jdk_sha256 = jdk_url_and_sha(jdk_version)
     template = args.template or find_template_for_version(cratedb_version)
@@ -142,7 +158,7 @@ def main():
     template = env.get_template(template)
     print(template.render(
         CRATE_VERSION=cratedb_version,
-        CRATE_RELEASE_URL=CRATEDB_RELEASE_URL,
+        CRATE_RELEASE_URL=CRATEDB_RELEASE_URL if cratedb_version.snapshot is None else CRATEDB_NIGHTLY_URL,
         CRATE_URL=cratedb_url, # for versions < 4.2
         CRASH_VERSION=crash_version,
         CRASH_URL=crash_url,
