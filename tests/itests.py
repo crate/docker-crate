@@ -139,8 +139,8 @@ class SimpleRunTest(DockerBaseTestCase):
     def testRun(self):
         self.wait_for_cluster()
         lg = self.logs().decode("utf-8").split('\n')
-        self.assertTrue('elected-as-master' in lg[-4:][0])
-        self.assertTrue(lg[-2:][0].endswith('started'))
+        self.assertIn('elected-as-master', lg[-5:][0])
+        self.assertIn('started', lg[-2:][0])
 
 
 class JavaPropertiesTest(DockerBaseTestCase):

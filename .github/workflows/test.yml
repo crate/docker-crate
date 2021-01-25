@@ -1,0 +1,30 @@
+---
+name: Integration tests
+on:
+  pull_request: ~
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Integration tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+
+      - name: Install requirements
+        run: python -m pip install -r ./requirements.txt
+
+      - name: Generate Dockerfile & run tests
+        run: |
+          VERSION=$(curl -s https://crate.io/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
+          ./update.py --cratedb-version ${VERSION} > Dockerfile
+          sysctl -w vm.max_map_count=262144
+          PATH_TO_IMAGE=. zope-testrunner --path . -s tests --color
