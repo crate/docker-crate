@@ -30,7 +30,7 @@ class Version(NamedTuple):
 
     @classmethod
     def parse(cls, s: str):
-        if s is None:
+        if not s:
             return None
         parts = s.split('.', maxsplit=2)
         snapshot_parts = parts[2].split('-', maxsplit=1)
