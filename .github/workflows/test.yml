@@ -26,5 +26,4 @@ jobs:
         run: |
           VERSION=$(curl -s https://crate.io/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
           ./update.py --cratedb-version ${VERSION} > Dockerfile
-          sysctl -w vm.max_map_count=262144
           PATH_TO_IMAGE=. zope-testrunner --path . -s tests --color
