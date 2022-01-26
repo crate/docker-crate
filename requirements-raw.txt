@@ -1,0 +1,6 @@
+Jinja2
+zope.testrunner
+requests
+psycopg2-binary
+appdirs
+docker
