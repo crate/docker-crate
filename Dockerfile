@@ -19,15 +19,15 @@ RUN yum install -y yum-utils \
             x86_64)  echo x64_linux ;; \
             aarch64) echo aarch64_linux ;; \
         esac)" \
-    && export CRATE_URL=https://cdn.crate.io/downloads/releases/cratedb/${PLATFORM}/crate-4.7.0.tar.gz \
+    && export CRATE_URL=https://cdn.crate.io/downloads/releases/cratedb/${PLATFORM}/crate-4.6.8.tar.gz \
     && curl -fSL -O ${CRATE_URL} \
     && curl -fSL -O ${CRATE_URL}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-4.7.0.tar.gz.asc crate-4.7.0.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-4.7.0.tar.gz.asc \
-    && tar -xf crate-4.7.0.tar.gz -C /crate --strip-components=1 \
-    && rm crate-4.7.0.tar.gz \
+    && gpg --batch --verify crate-4.6.8.tar.gz.asc crate-4.6.8.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-4.6.8.tar.gz.asc \
+    && tar -xf crate-4.6.8.tar.gz -C /crate --strip-components=1 \
+    && rm crate-4.6.8.tar.gz \
     && ln -sf /usr/bin/python3.6 /usr/bin/python3
 
 # install crash
@@ -62,13 +62,13 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.opencontainers.image.created="2022-01-26T09:48:10.009142" \
+    org.opencontainers.image.created="2022-03-10T10:39:18.218424" \
     org.opencontainers.image.title="crate" \
     org.opencontainers.image.description="CrateDB is a distributed SQL database handles massive amounts of machine data in real-time." \
     org.opencontainers.image.url="https://crate.io/products/cratedb/" \
     org.opencontainers.image.source="https://github.com/crate/docker-crate" \
     org.opencontainers.image.vendor="Crate.io" \
-    org.opencontainers.image.version="4.7.0"
+    org.opencontainers.image.version="4.6.8"
 
 COPY docker-entrypoint.sh /
 
