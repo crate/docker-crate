@@ -6,38 +6,41 @@
 
 FROM centos:7
 
-RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
-
-# install crate
-RUN yum install -y yum-utils \
+# Install prerequisites and package updates and clean up repository indexes again
+RUN yum install -y yum-utils deltarpm \
     && yum makecache \
-    && yum install -y python36 openssl \
+    && yum install -y python3 openssl \
+    && yum upgrade -y \
+    && pip3 install "pip>=19,<19.3" --upgrade \
     && yum clean all \
-    && rm -rf /var/cache/yum \
+    && rm -rf /var/cache/yum
+
+# Install CrateDB
+RUN groupadd crate \
+    && useradd -u 1000 -g crate -d /crate crate \
     && export PLATFORM="$( \
         case $(uname --m) in \
             x86_64)  echo x64_linux ;; \
             aarch64) echo aarch64_linux ;; \
         esac)" \
-    && export CRATE_URL=https://cdn.crate.io/downloads/releases/cratedb/${PLATFORM}/crate-4.8.0.tar.gz \
+    && export CRATE_URL=https://cdn.crate.io/downloads/releases/cratedb/${PLATFORM}/crate-4.7.3.tar.gz \
     && curl -fSL -O ${CRATE_URL} \
     && curl -fSL -O ${CRATE_URL}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-4.8.0.tar.gz.asc crate-4.8.0.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-4.8.0.tar.gz.asc \
-    && tar -xf crate-4.8.0.tar.gz -C /crate --strip-components=1 \
-    && rm crate-4.8.0.tar.gz \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python3
+    && gpg --batch --verify crate-4.7.3.tar.gz.asc crate-4.7.3.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-4.7.3.tar.gz.asc \
+    && tar -xf crate-4.7.3.tar.gz -C /crate --strip-components=1 \
+    && rm crate-4.7.3.tar.gz
 
-# install crash
-RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.27.0 \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.27.0.asc \
+# Install crash
+RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.28.0 \
+    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.28.0.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crash_standalone_0.27.0.asc crash_standalone_0.27.0 \
-    && rm -rf "$GNUPGHOME" crash_standalone_0.27.0.asc \
-    && mv crash_standalone_0.27.0 /usr/local/bin/crash \
+    && gpg --batch --verify crash_standalone_0.28.0.asc crash_standalone_0.28.0 \
+    && rm -rf "$GNUPGHOME" crash_standalone_0.28.0.asc \
+    && mv crash_standalone_0.28.0 /usr/local/bin/crash \
     && chmod +x /usr/local/bin/crash
 
 ENV PATH /crate/bin:$PATH
@@ -62,13 +65,13 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.opencontainers.image.created="2022-04-28T18:53:07.088304" \
+    org.opencontainers.image.created="2022-05-24T15:45:34.917877" \
     org.opencontainers.image.title="crate" \
     org.opencontainers.image.description="CrateDB is a distributed SQL database that handles massive amounts of machine data in real-time." \
     org.opencontainers.image.url="https://crate.io/products/cratedb/" \
     org.opencontainers.image.source="https://github.com/crate/docker-crate" \
     org.opencontainers.image.vendor="Crate.io" \
-    org.opencontainers.image.version="4.8.0"
+    org.opencontainers.image.version="4.7.3"
 
 COPY docker-entrypoint.sh /
 
