@@ -12,7 +12,7 @@ RUN yum install -y yum-utils deltarpm \
     && yum makecache \
     && yum install -y python3 openssl \
     && yum upgrade -y \
-    && pip3 install "pip>=19,<19.3" --upgrade \
+    && pip3 install --upgrade pip \
     && yum clean all \
     && rm -rf /var/cache/yum
 
