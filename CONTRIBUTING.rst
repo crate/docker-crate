@@ -37,7 +37,7 @@ For starting an instance of CrateDB and connecting to it, run::
 
 Run a vulnerability scan on the resulting image::
 
-    grype --config .grype.yaml --only-fixed --fail-on medium local/crate:${CRATEDB_VERSION}
+    grype --only-fixed --fail-on medium local/crate:${CRATEDB_VERSION}
     trivy image --severity "CRITICAL,HIGH,MEDIUM" --ignore-unfixed --exit-code 1 local/crate:${CRATEDB_VERSION}
 
 .. _contribution guide: https://github.com/crate/crate/blob/master/CONTRIBUTING.rst
