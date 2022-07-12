@@ -10,8 +10,8 @@ FROM centos:7
 # Install prerequisites and package updates and clean up repository indexes again
 RUN yum install -y yum-utils deltarpm \
     && yum makecache \
-    && yum install -y python3 openssl \
     && yum upgrade -y \
+    && yum install -y python3 openssl \
     && pip3 install --upgrade pip \
     && yum clean all \
     && rm -rf /var/cache/yum
