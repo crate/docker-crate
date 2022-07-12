@@ -14,9 +14,16 @@ Usage
 In order to create a Dockerfile for local testing and create a container image,
 use those commands::
 
+    # Create Dockerfile for building a GA image
     export CRATEDB_VERSION=5.0.0
-    python3 update.py --cratedb-version ${CRATEDB_VERSION} > Dockerfile.probe
-    docker build --file Dockerfile.probe --tag local/crate:${CRATEDB_VERSION} .
+    python3 update.py --cratedb-version ${CRATEDB_VERSION} > Dockerfile-${CRATEDB_VERSION}
+
+    # Create Dockerfile for building a nightly image
+    export CRATEDB_VERSION=5.0.0-202207120003-fb24ad5
+    python3 update.py --cratedb-tarball https://cdn.crate.io/downloads/releases/nightly/crate-${CRATEDB_VERSION}.tar.gz > Dockerfile-${CRATEDB_VERSION}
+
+    # Build
+    docker build --file Dockerfile-${CRATEDB_VERSION} --tag local/crate:${CRATEDB_VERSION} .
 
 To introspect the software versions available, run::
 
