@@ -1,8 +1,0 @@
-ignore:
-
-  # Two vulnerabilities for pip 9.0.3.
-  # Fixed with `pip3 install --upgrade pip`.
-  # Grype would still complain, because it picks up the RPM-installed `python3-pip` package.
-  # It can't be removed, because `python3` has a dependency on it.
-  - vulnerability: GHSA-gpvv-69j7-gwj8  # CVE-2019-20916
-  - vulnerability: GHSA-5xp3-jfq3-5q8x  # CVE-2021-3572
