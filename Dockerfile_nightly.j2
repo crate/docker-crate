@@ -7,14 +7,18 @@
 
 FROM centos:7
 
-RUN groupadd crate && useradd -u 1000 -g crate -d /crate crate
-
-# install crate
-RUN yum install -y yum-utils \
+# Install prerequisites and package updates and clean up repository indexes again
+RUN yum install -y yum-utils deltarpm \
     && yum makecache \
-    && yum install -y python36 openssl \
+    && yum install -y python3 openssl \
+    && yum upgrade -y \
+    && pip3 install --upgrade pip \
     && yum clean all \
-    && rm -rf /var/cache/yum \
+    && rm -rf /var/cache/yum
+
+# Install CrateDB
+RUN groupadd crate \
+    && useradd -u 1000 -g crate -d /crate crate \
     && export CRATE_URL={{ CRATE_RELEASE_URL }}/{{ CRATE_TAR_GZ }} \
     && curl -fSL -O ${CRATE_URL} \
     && curl -fSL -O ${CRATE_URL}.asc \
@@ -23,10 +27,9 @@ RUN yum install -y yum-utils \
     && gpg --batch --verify {{ CRATE_TAR_GZ }}.asc {{ CRATE_TAR_GZ }} \
     && rm -rf "$GNUPGHOME" {{ CRATE_TAR_GZ }}.asc \
     && tar -xf {{ CRATE_TAR_GZ }} -C /crate --strip-components=1 \
-    && rm {{ CRATE_TAR_GZ }} \
-    && ln -sf /usr/bin/python3.6 /usr/bin/python3
+    && rm {{ CRATE_TAR_GZ }}
 
-# install crash
+# Install crash
 RUN curl -fSL -O {{ CRASH_URL }} \
     && curl -fSL -O {{ CRASH_URL }}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
