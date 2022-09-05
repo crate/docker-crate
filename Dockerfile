@@ -45,7 +45,7 @@ RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.28.0
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
-ENV CRATE_HEAP_SIZE 512M
+ENV CRATE_HEAP_SIZE 2G
 
 RUN mkdir -p /data/data /data/log
 
