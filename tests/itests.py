@@ -207,12 +207,18 @@ class CrateJavaOptsTest(DockerBaseTestCase):
 
 
 class MountedDataDirectoryTest(DockerBaseTestCase):
+    # Use a directory under `/tmp` for this test to satisfy Docker
+    # on Mac, which wouldn't allow dirs like `/data`, as the dirs
+    # used must be defined as shared resources in
+    # Preferences->Resources->File sharing, and `/tmp` is set there
+    # by default
+
     """
-    docker run --volume $(mktemp -d):/data crate
+    docker run --volume $(mktemp -d):/tmp/crate_data crate
     """
 
     VOLUMES = {
-        '/data': {
+        '/tmp/crate_data': {
             'bind': mkdtemp(),
             'mode': 'rw',
         }
@@ -230,7 +236,7 @@ class MountedDataDirectoryTest(DockerBaseTestCase):
         self.assertEqual(b'blobs\ndata\nlog\n', res)
 
     def tearDown(self):
-        rmtree(self.VOLUMES['/data']['bind'])
+        rmtree(self.VOLUMES['/tmp/crate_data']['bind'])
         super().tearDown()
 
 
