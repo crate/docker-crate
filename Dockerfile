@@ -23,15 +23,15 @@ RUN groupadd crate \
             x86_64)  echo x64_linux ;; \
             aarch64) echo aarch64_linux ;; \
         esac)" \
-    && export CRATE_URL=https://cdn.crate.io/downloads/releases/cratedb/${PLATFORM}/crate-5.1.0.tar.gz \
+    && export CRATE_URL=https://cdn.crate.io/downloads/releases/cratedb/${PLATFORM}/crate-5.0.3.tar.gz \
     && curl -fSL -O ${CRATE_URL} \
     && curl -fSL -O ${CRATE_URL}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-5.1.0.tar.gz.asc crate-5.1.0.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-5.1.0.tar.gz.asc \
-    && tar -xf crate-5.1.0.tar.gz -C /crate --strip-components=1 \
-    && rm crate-5.1.0.tar.gz
+    && gpg --batch --verify crate-5.0.3.tar.gz.asc crate-5.0.3.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-5.0.3.tar.gz.asc \
+    && tar -xf crate-5.0.3.tar.gz -C /crate --strip-components=1 \
+    && rm crate-5.0.3.tar.gz
 
 # Install crash
 RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.28.0 \
@@ -65,13 +65,13 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.opencontainers.image.created="2022-10-11T10:05:43.812121" \
+    org.opencontainers.image.created="2022-10-18T13:27:19.202647" \
     org.opencontainers.image.title="crate" \
     org.opencontainers.image.description="CrateDB is a distributed SQL database that handles massive amounts of machine data in real-time." \
     org.opencontainers.image.url="https://crate.io/products/cratedb/" \
     org.opencontainers.image.source="https://github.com/crate/docker-crate" \
     org.opencontainers.image.vendor="Crate.io" \
-    org.opencontainers.image.version="5.1.0"
+    org.opencontainers.image.version="5.0.3"
 
 COPY docker-entrypoint.sh /
 
