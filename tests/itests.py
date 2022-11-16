@@ -272,4 +272,4 @@ class TarballRemovedTest(DockerBaseTestCase):
         self.wait_for_cluster()
         id = self.cli.exec_create('crate', 'ls -la /crate-*')
         res = self.cli.exec_start(id['Id'])
-        self.assertEqual(b"ls: cannot access '/crate-*': No such file or directory\n", res)
+        self.assertEqual(b'ls: cannot access /crate-*: No such file or directory\n', res)
