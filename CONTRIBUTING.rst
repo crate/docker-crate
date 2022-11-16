@@ -15,11 +15,11 @@ In order to create a Dockerfile for local testing and create a container image,
 use those commands::
 
     # Create Dockerfile for building a GA image
-    export CRATEDB_VERSION=5.0.0
+    export CRATEDB_VERSION=5.1.1
     python3 update.py --cratedb-version ${CRATEDB_VERSION} > Dockerfile-${CRATEDB_VERSION}
 
     # Create Dockerfile for building a nightly image
-    export CRATEDB_VERSION=5.0.0-202207120003-fb24ad5
+    export CRATEDB_VERSION=5.2.0-202211160005-9ff831d
     python3 update.py --cratedb-tarball https://cdn.crate.io/downloads/releases/nightly/crate-${CRATEDB_VERSION}.tar.gz > Dockerfile-${CRATEDB_VERSION}
 
     # Build
