@@ -4,13 +4,11 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM almalinux:9
+FROM almalinux:9-minimal
 
-# Install prerequisites and package updates and clean up repository indexes again
-RUN yum install -y yum-utils \
-    && yum makecache \
-    && yum install -y python3 python3-pip \
-    && yum clean all \
+# Install prerequisites and clean up repository indexes again
+RUN microdnf install --nodocs --assumeyes gzip python3 shadow-utils tar \
+    && microdnf clean all \
     && rm -rf /var/cache/yum
 
 # Install CrateDB
@@ -21,15 +19,15 @@ RUN groupadd crate \
             x86_64)  echo x64_linux ;; \
             aarch64) echo aarch64_linux ;; \
         esac)" \
-    && export CRATE_URL=https://cdn.crate.io/downloads/releases/cratedb/${PLATFORM}/crate-5.2.6.tar.gz \
+    && export CRATE_URL=https://cdn.crate.io/downloads/releases/cratedb/${PLATFORM}/crate-5.3.0.tar.gz \
     && curl -fSL -O ${CRATE_URL} \
     && curl -fSL -O ${CRATE_URL}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crate-5.2.6.tar.gz.asc crate-5.2.6.tar.gz \
-    && rm -rf "$GNUPGHOME" crate-5.2.6.tar.gz.asc \
-    && tar -xf crate-5.2.6.tar.gz -C /crate --strip-components=1 \
-    && rm crate-5.2.6.tar.gz
+    && gpg --batch --verify crate-5.3.0.tar.gz.asc crate-5.3.0.tar.gz \
+    && rm -rf "$GNUPGHOME" crate-5.3.0.tar.gz.asc \
+    && tar -xf crate-5.3.0.tar.gz -C /crate --strip-components=1 \
+    && rm crate-5.3.0.tar.gz
 
 # Install crash
 RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.29.0 \
@@ -63,13 +61,13 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.opencontainers.image.created="2023-04-04T08:45:48.121205" \
+    org.opencontainers.image.created="2023-04-04T15:04:59.126585" \
     org.opencontainers.image.title="crate" \
     org.opencontainers.image.description="CrateDB is a distributed SQL database that handles massive amounts of machine data in real-time." \
     org.opencontainers.image.url="https://crate.io/products/cratedb/" \
     org.opencontainers.image.source="https://github.com/crate/docker-crate" \
     org.opencontainers.image.vendor="Crate.io" \
-    org.opencontainers.image.version="5.2.6"
+    org.opencontainers.image.version="5.3.0"
 
 COPY docker-entrypoint.sh /
 
