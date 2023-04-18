@@ -4,11 +4,11 @@
 # https://github.com/crate/docker-crate
 #
 
-FROM almalinux:9-minimal
+FROM almalinux:9
 
 # Install prerequisites and clean up repository indexes again
-RUN microdnf install --nodocs --assumeyes gzip python3 shadow-utils tar \
-    && microdnf clean all \
+RUN dnf install --nodocs --assumeyes gzip python3 shadow-utils tar \
+    && dnf clean all \
     && rm -rf /var/cache/yum
 
 # Install CrateDB
