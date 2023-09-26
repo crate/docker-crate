@@ -27,7 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip --quiet
           pip install -r requirements.txt --quiet
-          VERSION=$(curl -s https://crate.io/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
+          VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
           ./update.py --cratedb-version ${VERSION} > Dockerfile
 
       - name: Build CrateDB docker image
