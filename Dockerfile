@@ -61,7 +61,7 @@ COPY --chown=1000:0 config/crate.yml /crate/config/crate.yml
 COPY --chown=1000:0 config/log4j2.properties /crate/config/log4j2.properties
 
 LABEL maintainer="Crate.io <office@crate.io>" \
-    org.opencontainers.image.created="2024-10-07T18:12:01.604172" \
+    org.opencontainers.image.created="2024-10-08T08:42:47.653230" \
     org.opencontainers.image.title="crate" \
     org.opencontainers.image.description="CrateDB is a distributed SQL database that handles massive amounts of machine data in real-time." \
     org.opencontainers.image.url="https://crate.io/products/cratedb/" \
