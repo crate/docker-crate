@@ -7,7 +7,7 @@
 FROM almalinux:10-kitten
 
 # Install prerequisites and clean up repository indexes again
-RUN dnf install --nodocs --assumeyes gzip python3 shadow-utils tar gnupg \
+RUN dnf install --nodocs --assumeyes gzip python3 shadow-utils tar util-linux gnupg \
     && dnf clean all \
     && rm -rf /var/cache/yum
 
