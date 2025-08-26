@@ -15,7 +15,12 @@ RUN dnf install --nodocs --assumeyes gzip python3 shadow-utils tar util-linux gn
 # Install CrateDB
 RUN groupadd crate \
     && useradd -u 1000 -g crate -d /crate crate \
-    && export CRATE_URL={{ CRATE_RELEASE_URL }}/{{ CRATE_TAR_GZ }} \
+    && export PLATFORM="$( \
+        case $(uname --m) in \
+            x86_64)  echo "" ;; \
+            aarch64) echo "aarch64_linux" ;; \
+        esac)" \
+    && export CRATE_URL={{ CRATE_RELEASE_URL }}/${PLATFORM}/{{ CRATE_TAR_GZ }} \
     && curl -fSL -O ${CRATE_URL} \
     && curl -fSL -O ${CRATE_URL}.asc \
     && export GNUPGHOME="$(mktemp -d)" \
