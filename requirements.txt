@@ -8,7 +8,7 @@ MarkupSafe==2.0.1
 psycopg2-binary==2.9.3
 requests==2.31.0
 six==1.16.0
-urllib3==1.26.19
+urllib3==2.6.3
 websocket-client==1.2.3
 zope.exceptions==4.4
 zope.interface==5.4.0
