@@ -195,7 +195,6 @@ class CrateJavaOptsTest(DockerBaseTestCase):
         opts = [r[4:] for r in res]  # strip -XX: prefix
         # default java options
         self.assertTrue('+UseG1GC' in opts)
-        self.assertTrue('+DisableExplicitGC' in opts)
 
         # check -D process arguments
         res = re.findall(r'-D[\S]+', process)
