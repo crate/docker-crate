@@ -1,6 +1,17 @@
 ---
 name: CrateDB Docker images test
-on: [push]
+on:
+  pull_request: ~
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * *'
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   multi-arch-build:
