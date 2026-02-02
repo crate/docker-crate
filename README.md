@@ -15,4 +15,5 @@ See the [contribution docs](CONTRIBUTING.rst) for more information.
 Looking for more help?
 
 - Visit [the main CrateDB repository](https://github.com/crate/crate)
+- Read the [Run CrateDB on Docker Documentation](https://cratedb.com/docs/guide/install/container/docker.html)
 - Check out our [support channels](https://crate.io/support/)
