@@ -49,7 +49,6 @@ class DockerBaseTestCase(unittest.TestCase):
         super().__init__(methodName)
         self.container = None
         self.name = 'crate'
-        self.image = "crate/crate:test"
         self.is_running = False
 
     def connect(self, port=55432, user='crate'):
@@ -82,7 +81,7 @@ class DockerBaseTestCase(unittest.TestCase):
         ]
 
         self.container = client.create_container(
-            image=self.image,
+            image=TAG,
             command=cmd,
             ports=list(ports.keys()),
             host_config=host_conf,

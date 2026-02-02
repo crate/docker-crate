@@ -7,7 +7,7 @@ pipeline {
           agent { label "x64" }
           steps {
             sh '''
-              uv venv --python 3.10
+              uv venv --python 3.14
               uv pip install -r requirements.txt
               VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
               ./update.py --cratedb-version ${VERSION} > Dockerfile
@@ -19,7 +19,7 @@ pipeline {
           agent { label "aarch64" }
           steps {
             sh '''
-              uv venv --python 3.10
+              uv venv --python 3.14
               uv pip install -r requirements.txt
               VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
               ./update.py --cratedb-version ${VERSION} > Dockerfile
