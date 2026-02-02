@@ -72,7 +72,7 @@ Running tests
 
 To run the tests::
 
-    PATH_TO_IMAGE=. zope-testrunner --path . -s tests --color
+    PATH_TO_IMAGE=. python -m unittest -v
 
 Where ``PATH_TO_IMAGE`` is a root-relative path to a folder with a Dockerfile.
 

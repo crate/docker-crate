@@ -5,11 +5,38 @@
 import re
 import time
 import unittest
+import docker
+import os
+import sys
 
 from tempfile import mkdtemp
 from shutil import rmtree
 from psycopg2 import connect
-from .utils import print_debug
+from .utils import print_debug, print_build_output
+
+
+DIR = os.path.dirname(__file__)
+TAG = "crate/crate:test"
+
+client = docker.APIClient(base_url='unix://var/run/docker.sock')
+
+
+def setUpModule():
+    path_to_image = os.path.join(DIR, "..", os.environ.get("PATH_TO_IMAGE", "."))
+    print(os.path.abspath(path_to_image))
+    output = client.build(
+        path=os.path.abspath(path_to_image),
+        tag=TAG,
+        rm=True,
+        forcerm=True
+    )
+    for line in output:
+        print_build_output(line)
+    sys.stdout.write('\n')
+
+
+def tearDownModule():
+    client.close()
 
 
 class InvalidState(Exception):
@@ -18,17 +45,16 @@ class InvalidState(Exception):
 
 class DockerBaseTestCase(unittest.TestCase):
 
-    def __init__(self, layer):
-        super(DockerBaseTestCase, self).__init__('testRun')
-        self._layer = layer
-        self.cli = layer.client
+    def __init__(self, methodName):
+        super().__init__(methodName)
         self.container = None
         self.name = 'crate'
+        self.image = "crate/crate:test"
         self.is_running = False
 
     def connect(self, port=55432, user='crate'):
         crate_ip = '127.0.0.1'
-        if self.cli.info()['OperatingSystem'].startswith(u'Boot2Docker'):
+        if client.info()['OperatingSystem'].startswith(u'Boot2Docker'):
             import subprocess
             crate_ip = subprocess.check_output(r'docker-machine ip',
                                                stderr=None, shell=True).decode("utf-8").strip('\n')
@@ -39,7 +65,7 @@ class DockerBaseTestCase(unittest.TestCase):
             raise InvalidState('Container is still running.')
 
         ulimits = [dict(name='memlock', soft=-1, hard=-1)]
-        host_conf = self.cli.create_host_config(
+        host_conf = client.create_host_config(
             port_bindings=ports,
             binds=volumes,
             ulimits=ulimits,
@@ -55,8 +81,8 @@ class DockerBaseTestCase(unittest.TestCase):
             'CRATE_HEAP_SIZE=128m',
         ]
 
-        self.container = self.cli.create_container(
-            image=self._layer.tag,
+        self.container = client.create_container(
+            image=self.image,
             command=cmd,
             ports=list(ports.keys()),
             host_config=host_conf,
@@ -64,7 +90,7 @@ class DockerBaseTestCase(unittest.TestCase):
             volumes=['/data'],
             name=self.name
         )
-        self.cli.start(self.container_id)
+        client.start(self.container_id)
         process = self.crate_process()
         print_debug('Waiting for Docker container ...')
         while not process:
@@ -72,16 +98,13 @@ class DockerBaseTestCase(unittest.TestCase):
             process = self.crate_process()
         self.is_running = True
 
-    def setUp(self):
-        pass
-
     def tearDown(self):
         if self.container_id:
             self.stop(self.container_id)
 
     def stop(self, _id):
-        self.cli.stop(_id)
-        self.cli.remove_container(_id)
+        client.stop(_id)
+        client.remove_container(_id)
         self.container = None
         time.sleep(1)
         self.is_running = False
@@ -91,7 +114,7 @@ class DockerBaseTestCase(unittest.TestCase):
         return self.container and self.container.get('Id') or None
 
     def info(self, key=None):
-        top = self.cli and self.cli.top(self.name) or {}
+        top = client.top(self.name)
         return key and top.get(key) or top
 
     def crate_process(self):
@@ -107,11 +130,11 @@ class DockerBaseTestCase(unittest.TestCase):
         return ''
 
     def logs(self):
-        return self.cli.logs(self.name)
+        return client.logs(self.name)
 
     def wait_for_cluster(self):
         print_debug('Waiting for CrateDB to start ...')
-        for line in self.cli.logs(self.name, stream=True):
+        for line in client.logs(self.name, stream=True):
             l = line.decode("utf-8").strip('\n').strip()
             print_debug(l)
             if "[ERROR" in l:
@@ -120,7 +143,7 @@ class DockerBaseTestCase(unittest.TestCase):
                 break
 
 
-def docker(cmd, ports={}, env=[], volumes={}):
+def docker_cmd(cmd, ports={}, env=[], volumes={}):
     def wrap(fn):
         def inner_fn(self, *args, **kwargs):
             print_debug(self.__class__.__doc__)
@@ -135,8 +158,8 @@ class SimpleRunTest(DockerBaseTestCase):
     docker run crate crate
     """
 
-    @docker(['crate'], ports={}, env=[])
-    def testRun(self):
+    @docker_cmd(['crate'], ports={}, env=[])
+    def test_run(self):
         self.wait_for_cluster()
         lg = self.logs().decode("utf-8").split('\n')
         self.assertIn('elected-as-master', lg[-5:][0])
@@ -148,12 +171,16 @@ class JavaPropertiesTest(DockerBaseTestCase):
     docker run crate crate -Ccluster.name=foo crate -Cnode.name=bar
     """
 
-    @docker(['crate', '-Ccluster.name=foo', '-Cnode.name=bar'],
-            ports={5432:55432}, env=[])
-    def testRun(self):
+    @docker_cmd(
+        ['crate', '-Ccluster.name=foo', '-Cnode.name=bar'],
+        ports={5432:55432},
+        env=[]
+    )
+    def test_run(self):
         self.wait_for_cluster()
-        conn = self.connect(port=55432)
-        with conn.cursor() as cursor:
+        with self.connect(port=55432) as conn:
+            cursor = conn.cursor()
+
             # cluster name
             cursor.execute('''select name from sys.cluster''')
             res = cursor.fetchall()
@@ -162,7 +189,6 @@ class JavaPropertiesTest(DockerBaseTestCase):
             cursor.execute('''select name from sys.nodes''')
             res = cursor.fetchall()
             self.assertEqual(res[0][0], 'bar')
-        conn.close()
 
 
 class CrateHeapSizeTest(DockerBaseTestCase):
@@ -170,8 +196,8 @@ class CrateHeapSizeTest(DockerBaseTestCase):
     docker run --env CRATE_HEAP_SIZE=256m crate
     """
 
-    @docker(['crate'], ports={}, env=['CRATE_HEAP_SIZE=256m'])
-    def testRun(self):
+    @docker_cmd(['crate'], ports={}, env=['CRATE_HEAP_SIZE=256m'])
+    def test_run(self):
         self.wait_for_cluster()
         # check -Xmx and -Xms process arguments
         process = self.crate_process()
@@ -185,8 +211,12 @@ class CrateJavaOptsTest(DockerBaseTestCase):
     docker run --env CRATE_JAVA_OPTS="-Dcom.sun.management.jmxremote" crate
     """
 
-    @docker(['crate'], ports={}, env=['CRATE_JAVA_OPTS=-Dcom.sun.management.jmxremote'])
-    def testRun(self):
+    @docker_cmd(
+        ['crate'],
+        ports={},
+        env=['CRATE_JAVA_OPTS=-Dcom.sun.management.jmxremote']
+    )
+    def test_run(self):
         self.wait_for_cluster()
 
         # check -XX process arguments
@@ -223,15 +253,12 @@ class MountedDataDirectoryTest(DockerBaseTestCase):
         }
     }
 
-    @docker(['crate'],
-            ports={},
-            env=[],
-            volumes=VOLUMES)
-    def testRun(self):
+    @docker_cmd(['crate'], ports={}, env=[], volumes=VOLUMES)
+    def test_run(self):
         self.wait_for_cluster()
 
-        id = self.cli.exec_create('crate', 'ls /data')
-        res = self.cli.exec_start(id['Id'])
+        id = client.exec_create('crate', 'ls /data')
+        res = client.exec_start(id['Id'])
         self.assertEqual(b'blobs\ndata\nlog\n', res)
 
     def tearDown(self):
@@ -244,16 +271,15 @@ class NodeStatsTest(DockerBaseTestCase):
     docker run crate
     """
 
-    @docker(['crate'], ports={5432:55432}, env=[])
-    def testRun(self):
+    @docker_cmd(['crate'], ports={5432:55432}, env=[])
+    def test_run(self):
         self.wait_for_cluster()
-        conn = self.connect(port=55432)
-        with conn.cursor() as cursor:
+        with self.connect(port=55432) as conn:
+            cursor = conn.cursor()
             cursor.execute("select load from sys.nodes limit 1")
             self.assert_not_fallback_values(cursor.fetchall())
             cursor.execute("select mem from sys.nodes limit 1")
             self.assert_not_fallback_values(cursor.fetchall())
-        conn.close()
 
     def assert_not_fallback_values(self, result):
         for entry in result:
@@ -266,9 +292,9 @@ class TarballRemovedTest(DockerBaseTestCase):
     docker run crate /bin/sh -c 'ls -la /crate-*'
     """
 
-    @docker(['crate'], ports={}, env=[])
-    def testRun(self):
+    @docker_cmd(['crate'], ports={}, env=[])
+    def test_run(self):
         self.wait_for_cluster()
-        id = self.cli.exec_create('crate', 'ls -la /crate-*')
-        res = self.cli.exec_start(id['Id'])
+        id = client.exec_create('crate', 'ls -la /crate-*')
+        res = client.exec_start(id['Id'])
         self.assertEqual(b"ls: cannot access '/crate-*': No such file or directory\n", res)

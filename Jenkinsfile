@@ -12,7 +12,7 @@ pipeline {
               VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
               ./update.py --cratedb-version ${VERSION} > Dockerfile
             '''.stripIndent()
-            sh 'PATH_TO_IMAGE=. uv run zope-testrunner --path . -s tests --color'
+            sh 'uv run -m unittest -v'
           }
         }
         stage("Integration tests aarch64") {
@@ -24,7 +24,7 @@ pipeline {
               VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
               ./update.py --cratedb-version ${VERSION} > Dockerfile
             '''.stripIndent()
-            sh 'PATH_TO_IMAGE=. uv run zope-testrunner --path . -s tests --color'
+            sh 'uv run -m unittest -v'
           }
         }
         stage("Docker build & test x86_64") {
