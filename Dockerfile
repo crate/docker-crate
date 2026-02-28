@@ -30,14 +30,9 @@ RUN groupadd crate \
     && rm crate-6.2.1.tar.gz
 
 # Install crash
-RUN curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.31.5 \
-    && curl -fSL -O https://cdn.crate.io/downloads/releases/crash_standalone_0.31.5.asc \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 90C23FC6585BC0717F8FBFC37FAAE51A06F6EAEB \
-    && gpg --batch --verify crash_standalone_0.31.5.asc crash_standalone_0.31.5 \
-    && rm -rf "$GNUPGHOME" crash_standalone_0.31.5.asc \
-    && mv crash_standalone_0.31.5 /usr/local/bin/crash \
-    && chmod +x /usr/local/bin/crash
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+RUN uv tool install 'crash==0.31.5'
+ENV PATH=/root/.local/bin:$PATH
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
