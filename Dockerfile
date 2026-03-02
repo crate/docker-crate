@@ -7,7 +7,7 @@
 FROM almalinux:10-kitten
 
 # Install prerequisites and clean up repository indexes again
-RUN dnf install --nodocs --assumeyes gzip python3 shadow-utils tar util-linux gnupg \
+RUN dnf install --nodocs --assumeyes gzip python3 python3-pip shadow-utils tar util-linux gnupg \
     && dnf clean all \
     && rm -rf /var/cache/yum
 
@@ -30,9 +30,7 @@ RUN groupadd crate \
     && rm crate-6.2.1.tar.gz
 
 # Install crash
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
-RUN uv tool install 'crash==0.31.5'
-ENV PATH=/root/.local/bin:$PATH
+RUN python3 -m pip install 'crash==0.31.5'
 
 ENV PATH /crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
