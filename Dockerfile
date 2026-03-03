@@ -32,9 +32,9 @@ RUN groupadd crate \
 # Install crash
 RUN python3 -m pip install 'crash==0.31.5'
 
-ENV PATH /crate/bin:$PATH
+ENV PATH=/crate/bin:$PATH
 # Default heap size for Docker, can be overwritten by args
-ENV CRATE_HEAP_SIZE 512M
+ENV CRATE_HEAP_SIZE=512M
 
 RUN mkdir -p /data/data /data/log
 
