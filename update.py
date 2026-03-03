@@ -4,7 +4,7 @@ import argparse
 import json
 import os
 import re
-from datetime import datetime
+import datetime as dt
 from jinja2 import Environment, FileSystemLoader
 from typing import NamedTuple, Optional, Tuple
 from urllib.error import URLError
@@ -165,7 +165,7 @@ def main():
         JDK_VERSION=jdk_version,
         JDK_URL=jdk_url,
         JDK_SHA256=jdk_sha256,
-        BUILD_TIMESTAMP=datetime.utcnow().isoformat()
+        BUILD_TIMESTAMP=dt.datetime.now(dt.UTC).isoformat()
     ))
 
 
