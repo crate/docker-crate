@@ -10,7 +10,7 @@ pipeline {
               uv venv --python 3.14 --clear
               uv pip install -r requirements.txt
               VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
-              ./update.py --cratedb-version ${VERSION} > Dockerfile
+              uv run update.py --cratedb-version ${VERSION} > Dockerfile
             '''.stripIndent()
             sh 'uv run -m unittest -v'
           }
@@ -22,7 +22,7 @@ pipeline {
               uv venv --python 3.14 --clear
               uv pip install -r requirements.txt
               VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
-              ./update.py --cratedb-version ${VERSION} > Dockerfile
+              uv run update.py --cratedb-version ${VERSION} > Dockerfile
             '''.stripIndent()
             sh 'uv run -m unittest -v'
           }
@@ -36,7 +36,7 @@ pipeline {
               uv venv --python 3.14 --clear
               uv pip install -r requirements.txt
               VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
-              uv run ./update.py --cratedb-version ${VERSION} > Dockerfile
+              uv run update.py --cratedb-version ${VERSION} > Dockerfile
 
               docker build \
                 --pull \
@@ -62,7 +62,7 @@ pipeline {
               uv venv --python 3.14 --clear
               uv pip install -r requirements.txt
               VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
-              uv run ./update.py --cratedb-version ${VERSION} > Dockerfile
+              uv run update.py --cratedb-version ${VERSION} > Dockerfile
 
               docker build \
                 --pull \
