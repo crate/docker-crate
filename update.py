@@ -68,14 +68,14 @@ def url_exists(url: str) -> bool:
         return False
 
 
-def ensure_existing_crash_release(crash_version: Version) -> Tuple[Version, str]:
-    if not crash_version:
-        crash_version = latest_crash()
-    url = RELEASE_URL + f'crash_standalone_{crash_version}'
+def ensure_existing_crash_release(version: Optional[Version]) -> Tuple[Version, str]:
+    if not version:
+        version = latest_crash()
+    url = f"https://files.pythonhosted.org/packages/source/c/crash/crash-{version}.tar.gz"
     if url_exists(url):
-        return crash_version, url
+        return version, url
     else:
-        raise ValueError(f'No release found for crash {crash_version}')
+        raise ValueError(f'No release found for crash {version}')
 
 
 def ensure_existing_cratedb_release(cratedb_version: Version, platform: str) -> str:
