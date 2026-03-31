@@ -3,30 +3,6 @@ pipeline {
   stages {
     stage("Parallel") {
       parallel {
-        stage("Integration tests x86_64") {
-          agent { label "medium && x64" }
-          steps {
-            sh '''
-              uv venv --python 3.14 --clear
-              uv pip install -r requirements.txt
-              VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
-              uv run update.py --cratedb-version ${VERSION} > Dockerfile
-            '''.stripIndent()
-            sh 'uv run -m unittest -v'
-          }
-        }
-        stage("Integration tests aarch64") {
-          agent { label "medium && aarch64" }
-          steps {
-            sh '''
-              uv venv --python 3.14 --clear
-              uv pip install -r requirements.txt
-              VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
-              uv run update.py --cratedb-version ${VERSION} > Dockerfile
-            '''.stripIndent()
-            sh 'uv run -m unittest -v'
-          }
-        }
         stage("Docker build & test x86_64") {
           agent { label "medium && x64" }
           steps {
@@ -50,6 +26,7 @@ pipeline {
               git clone --filter=blob:none https://github.com/docker-library/official-images.git ./official-images
               ./official-images/test/run.sh crate/crate:ci_test
             '''.stripIndent()
+            sh 'uv run -m unittest -v'
           }
         }
 
@@ -76,6 +53,7 @@ pipeline {
               git clone --filter=blob:none https://github.com/docker-library/official-images.git ./official-images
               ./official-images/test/run.sh crate/crate:ci_test
             '''.stripIndent()
+            sh 'uv run -m unittest -v'
           }
         }
       }
