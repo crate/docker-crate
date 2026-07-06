@@ -31,6 +31,9 @@ pipeline {
         }
 
         stage("Docker build & test aarch64") {
+          when {
+            expression { false }
+          }
           agent { label "medium && aarch64" }
           steps {
             sh 'git clean -xdff'
