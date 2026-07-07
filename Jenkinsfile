@@ -29,36 +29,6 @@ pipeline {
             sh 'uv run -m unittest -v'
           }
         }
-
-        stage("Docker build & test aarch64") {
-          when {
-            expression { false }
-          }
-          agent { label "medium && aarch64" }
-          steps {
-            sh 'git clean -xdff'
-            checkout scm
-            sh '''
-              uv venv --python 3.14 --clear
-              uv pip install -r requirements.txt
-              VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
-              uv run update.py --cratedb-version ${VERSION} > Dockerfile
-
-              docker build \
-                --pull \
-                --platform linux/arm64 \
-                --rm \
-                --force-rm \
-                --file ./Dockerfile . \
-                --tag crate/crate:ci_test
-
-              rm -rf ./official-images
-              git clone --filter=blob:none https://github.com/docker-library/official-images.git ./official-images
-              ./official-images/test/run.sh crate/crate:ci_test
-            '''.stripIndent()
-            sh 'uv run -m unittest -v'
-          }
-        }
       }
     }
   }
