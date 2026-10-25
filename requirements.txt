@@ -1,5 +1,5 @@
 appdirs==1.4.4
-certifi==2026.1.4
+certifi==2026.10.19
 charset-normalizer==3.4.4
 docker==7.1.0
 idna==3.15
