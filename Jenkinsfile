@@ -11,7 +11,7 @@ pipeline {
             sh '''
               uv venv --python 3.14 --clear
               uv pip install -r requirements.txt
-              VERSION=$(curl -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
+              VERSION=$(curl -L -s https://cratedb.com/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
               uv run update.py --cratedb-version ${VERSION} > Dockerfile
 
               docker build \
